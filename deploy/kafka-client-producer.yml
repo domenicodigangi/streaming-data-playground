@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-client-producer
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-client-producer
+  template:
+    metadata:
+      labels:
+        app: kafka-client-producer
+    spec:
+      containers:
+        - name: kafka-client-producer
+          image: docker.io/bitnami/kafka:3.4.0-debian-11-r22
+          command: ["sleep", "infinity"]
