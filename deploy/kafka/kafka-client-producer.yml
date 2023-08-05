@@ -17,3 +17,8 @@ spec:
         - name: kafka-client-producer
           image: docker.io/bitnami/kafka:3.4.0-debian-11-r22
           command: ["sleep", "infinity"]
+          env:
+            - name: "KAFKA_TOPIC_NAME"
+              value: "topic-01"
+            - name: "KAFKA_SERVER_PATH"
+              value: "kafka.default.svc.cluster.local:9092"
