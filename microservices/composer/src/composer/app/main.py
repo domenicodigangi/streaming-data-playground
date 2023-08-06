@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .api.api_v1 import router as api_v1_router
+from composer.api.time_series import router as ts_router
 
 
 app = FastAPI()
@@ -9,4 +9,5 @@ app = FastAPI()
 def read_root():
     return {"Hello": "FastAPI"}
 
-app.include_router(api_v1_router, prefix="/v1")
+
+app.include_router(ts_router, prefix="/v1/time_series")

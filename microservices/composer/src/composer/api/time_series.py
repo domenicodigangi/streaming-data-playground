@@ -12,8 +12,8 @@ router = APIRouter()
 #     "anomaly_magnitude": 3.0
 # }
 
-@router.post("/trigger-time-series")
-def trigger_time_series(params: TimeSeriesParameters):
+@router.post("/emit_to_kafka")
+def emit_time_series(params: TimeSeriesParameters):
     try:
         time_series_generator = TimeSeriesGenerator(params)
         time_series = time_series_generator.generate()
