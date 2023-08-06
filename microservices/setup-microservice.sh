@@ -17,6 +17,36 @@ mkdir -p test
 touch README.md
 touch requirements.txt
 
+# Create the pyproject.toml file and populate it with the specified content
+cat << EOF > pyproject.toml
+[build-system]
+requires = ["poetry>=1.0"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "$proj_name"
+version = "0.1.0"
+description = "Publish time series with anomalies"
+authors = ["Your Name <your.email@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.101.0"
+uvicorn = "^0.23.2"
+confluent-kafka = "^2.2.0"
+numpy = "^1.25.2"
+pandas = "^2.0.3"
+pydantic = "^2.1.1"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+$proj_name = "$proj_name.app.main:app"
+
+[tool.poetry.extras]
+EOF
+
+
 # Create the Dockerfile and populate it with the appropriate content
 cat <<EOT >Dockerfile
 # Use an official Python runtime as a parent image

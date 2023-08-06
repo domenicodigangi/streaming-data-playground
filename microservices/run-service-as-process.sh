@@ -1,6 +1,6 @@
 
 # Get the folder name as input
-read -p "Enter the project name: " proj_name
+proj_name=$1
 
 cd /workspaces/streaming-anomaly-detection/microservices/${proj_name}
 source "venv_${proj_name}"/bin/activate
