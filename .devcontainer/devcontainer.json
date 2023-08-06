@@ -27,6 +27,7 @@
         "github.copilot",
         "donjayamanne.githistory",
         "mhutchie.git-graph",
+        "rangav.vscode-thunder-client",
     ],
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
