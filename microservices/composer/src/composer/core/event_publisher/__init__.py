@@ -27,3 +27,4 @@ class EventPublisher:
     def _publish_to_rabbitmq(self, timestamp, value):
         # TODO: Add code to publish to RabbitMQ
         print(f"Publishing to RabbitMQ -> Timestamp: {timestamp}, Value: {value}")
+

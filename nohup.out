@@ -1,0 +1,25 @@
+E0806 17:37:31.843956    4179 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+E0806 17:37:31.844671    4179 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+E0806 17:37:31.846640    4179 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+E0806 17:37:31.857807    4179 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
+E0806 17:41:20.783121    7504 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+E0806 17:41:20.784022    7504 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+E0806 17:41:20.785550    7504 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+E0806 17:41:20.787033    7504 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
+E0806 17:45:27.012246    1349 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+E0806 17:45:27.016928    1349 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+E0806 17:45:27.018472    1349 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+E0806 17:45:27.019991    1349 memcache.go:265] couldn't get current server API group list: Get "http://localhost:8080/api?timeout=32s": dial tcp [::1]:8080: connect: connection refused
+The connection to the server localhost:8080 was refused - did you specify the right host or port?
+Forwarding from 127.0.0.1:3000 -> 3000
+Forwarding from 127.0.0.1:3001 -> 8080
+Forwarding from [::1]:3001 -> 8080
+Forwarding from [::1]:3000 -> 3000
+Handling connection for 3000
+Handling connection for 3000
+Handling connection for 3000
+Handling connection for 3000
+Handling connection for 3000
+Handling connection for 3000
