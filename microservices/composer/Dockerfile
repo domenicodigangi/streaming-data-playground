@@ -10,11 +10,13 @@ COPY . /app
 # Install the required packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
+# Make port 8000 available to the world outside this container
+EXPOSE 8000
 
-# Define environment variable for Python
-ENV PYTHONUNBUFFERED 1
+# Define environment variable for Kafka and Time Series (optional)
+# ENV KAFKA_BOOTSTRAP_SERVERS=your_kafka_server
+# ENV TIME_SERIES_INITIAL_TIMESTAMP=2022-01-01
+# Add other environment variables as needed
 
-# Run the main.py file when the container launches
-CMD ["python", "src/composer/app/main.py"]
+# Run the FastAPI app
+CMD ["uvicorn", "composer:app", "--host", "0.0.0.0", "--port", "8000"]
