@@ -1,1 +1,76 @@
+# Ignore Python virtual environments
+venv/
+env/
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore pipenv environment
+Pipfile
+Pipfile.lock
+
+# Ignore Poetry environment
+poetry.lock
+pyproject.toml
+
+# Ignore build files
+build/
+dist/
+*.egg-info/
+*.egg
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Ignore generated files
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore coverage reports
+htmlcov/
+.coverage
+.tox/
+
+# Ignore local development settings
+*.env
+*.env.*
+*.env.local
+*.env.development
+*.env.test
+*.env.production
+
+# Ignore any editor-specific files
+*.vscode/
+*.idea/
+*.pydevproject
+
+# Ignore compiled files for Cython or other extensions
+*.c
+*.cpp
+*.so
+*.dll
+*.pyd
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore pycache directories (used by some IDEs)
+__pycache__/
+
+# Ignore macOS specific files
+.DS_Store
+
+# Ignore Windows thumbnail cache files
+Thumbs.db
+
+# Ignore system-specific backup files
+*.bak
+*~
+
+# Ignore any log files
+*.log
+
 venv_*/
+nohup.out
