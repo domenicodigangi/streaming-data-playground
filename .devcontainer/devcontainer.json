@@ -24,6 +24,7 @@
         "ms-kubernetes-tools.vscode-kubernetes-tools",
         "ms-azuretools.vscode-docker",
         "ms-python.python",
+        "ms-python.black-formatter",
         "github.copilot",
         "donjayamanne.githistory",
         "mhutchie.git-graph",
