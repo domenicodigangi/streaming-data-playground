@@ -14,8 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 8000
 
 # Define environment variable for Kafka and Time Series (optional)
-# ENV KAFKA_BOOTSTRAP_SERVERS=your_kafka_server
-# ENV TIME_SERIES_INITIAL_TIMESTAMP=2022-01-01
+ENV KAFKA_BOOTSTRAP_SERVERS=kafka.default.svc.cluster.local:9092
 # Add other environment variables as needed
 
 # Run the FastAPI app
