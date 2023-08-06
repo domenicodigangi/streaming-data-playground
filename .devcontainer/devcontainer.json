@@ -20,16 +20,20 @@
         "ghcr.io/devcontainers-contrib/features/curl-apt-get:1": {},
         "ghcr.io/akhildevelops/devcontainer-features/apt:0": {}
     },
-    "extensions": [
-        "ms-kubernetes-tools.vscode-kubernetes-tools",
-        "ms-azuretools.vscode-docker",
-        "ms-python.python",
-        "ms-python.black-formatter",
-        "github.copilot",
-        "donjayamanne.githistory",
-        "mhutchie.git-graph",
-        "rangav.vscode-thunder-client",
-    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-kubernetes-tools.vscode-kubernetes-tools",
+                "ms-azuretools.vscode-docker",
+                "ms-python.python",
+                "ms-python.black-formatter",
+                "github.copilot",
+                "donjayamanne.githistory",
+                "mhutchie.git-graph",
+                "rangav.vscode-thunder-client",
+            ],
+        }
+    },
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
