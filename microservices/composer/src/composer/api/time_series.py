@@ -1,5 +1,7 @@
-
-from fastapi import APIRouter
+import uvicorn
+from composer.core.event_publisher import EventPublisher
+from composer.core.time_series_generator import TimeSeriesConfig, TimeSeriesGenerator
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 
@@ -12,8 +14,9 @@ router = APIRouter()
 #     "anomaly_magnitude": 3.0
 # }
 
+
 @router.post("/emit_to_kafka")
-def emit_time_series(params: TimeSeriesParameters):
+def emit_time_series(params: TimeSeriesConfig):
     try:
         time_series_generator = TimeSeriesGenerator(params)
         time_series = time_series_generator.generate()
@@ -23,9 +26,9 @@ def emit_time_series(params: TimeSeriesParameters):
         for timestamp, value in time_series.iteritems():
             publisher.emit(timestamp, value)
 
-        return {"status": "success", "message": "Time series generated and published to Kafka"}
+        return {
+            "status": "success",
+            "message": "Time series generated and published to Kafka",
+        }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)

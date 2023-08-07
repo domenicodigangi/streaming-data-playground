@@ -23,3 +23,9 @@ Handling connection for 3000
 Handling connection for 3000
 Handling connection for 3000
 Handling connection for 3000
+Forwarding from 127.0.0.1:3000 -> 3000
+Forwarding from [::1]:3000 -> 3000
+Forwarding from 127.0.0.1:3001 -> 8080
+Forwarding from [::1]:3001 -> 8080
+error: lost connection to pod
+error: lost connection to pod
