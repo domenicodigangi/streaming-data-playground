@@ -36,10 +36,10 @@
             ],
         }
     },
-    "postStartCommand": "nohup bash -c 'minikube start &' > minikube.log 2>&1",
-    "mounts": [
-        "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
-    ]
+    // "postStartCommand": "nohup bash -c 'minikube start &' > minikube.log 2>&1",
+    // "mounts": [
+    //     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+    // ]
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
