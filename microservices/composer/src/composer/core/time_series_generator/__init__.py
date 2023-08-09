@@ -20,11 +20,9 @@ class TimeSeriesConfig(BaseModel):
 
 class TimeSeriesGenerator:
     def __init__(self, params: TimeSeriesConfig):
-        self.config = TimeSeriesConfig.parse_obj(
-            {key: value for key, value in params.dict().items() if value is not None}
-        )
+        self.config = params
 
-    def generate(self):
+    def generate(self) -> pd.Series:
         timestamps = pd.date_range(
             start=self.config.initial_timestamp,
             periods=self.config.total_data_points,

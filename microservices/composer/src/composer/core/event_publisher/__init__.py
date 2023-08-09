@@ -1,4 +1,5 @@
 from confluent_kafka import Producer
+from composer.core.kafka import KafkaConfig
 
 class EventPublisher:
     def __init__(self, target="print"):

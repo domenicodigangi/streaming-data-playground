@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
 class KafkaConfig(BaseModel):
-    bootstrap_servers: str
-    topic_name: str
+    bootstrap_servers: str = "kafka.default.svc.cluster.local"
+    topic_name: str = "topic-01"
 
     class Config:
         env_prefix = "KAFKA_"
