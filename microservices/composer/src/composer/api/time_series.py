@@ -20,6 +20,7 @@ def emit_time_series(params: TimeSeriesConfig | None = None):
         publisher = EventPublisher(target="kafka")
 
         for timestamp, value in time_series.items():
+            logger.info("emit: %s: %s", timestamp, value)
             publisher.emit(timestamp, value)
 
         logger.info("Time series generated and published to Kafka")
