@@ -6,7 +6,7 @@ if minikube status | grep -q "host: Running"; then
     echo "Minikube is already running."
 else
     echo "Minikube is not running. Starting Minikube..."
-    minikube start
+    minikube start --cpus=4 --memory=10GB --disk-size=10GB
 fi
 
 . deploy/kafka/kafka-deploy.sh

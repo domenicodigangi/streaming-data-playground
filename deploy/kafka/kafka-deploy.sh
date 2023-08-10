@@ -15,7 +15,7 @@ helm repo add kafka-ui https://provectus.github.io/kafka-ui-charts
 #     echo "Service '$KAFKA_DEPLOYMENT_NAME' is already running."
 # else
     echo "Service '$KAFKA_DEPLOYMENT_NAME' is not running. Deploying..."
-    helm install $KAFKA_DEPLOYMENT_NAME bitnami/kafka --version 22.0.1 --set topics[0].name=topic-1,topics[0].partitions=1,topics[0].replicationFactor=2,externalAccess.service.type=NodePort,externalAccess.service.nodePorts=[30001] -n $NAMESPACE
+    helm install $KAFKA_DEPLOYMENT_NAME bitnami/kafka --version 22.0.1 --set topics[0].name=topic-1,topics[0].partitions=1,topics[0].replicationFactor=2,externalAccess.enabled=true,externalAccess.service.type=NodePort,externalAccess.service.nodePorts[0]=30001 -n $NAMESPACE
 
 # fi
 

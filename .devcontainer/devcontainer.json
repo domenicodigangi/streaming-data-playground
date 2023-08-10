@@ -6,9 +6,9 @@
     "image": "mcr.microsoft.com/devcontainers/base:bullseye",
     "features": {
         "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
-            "version": "1.19",
-            "helm": "3.5",
-            "minikube": "1.19"
+            "version": "latest",
+            "helm": "latest",
+            "minikube": "latest"
         },
         "ghcr.io/devcontainers/features/python:1": {
             "version": "3.11"

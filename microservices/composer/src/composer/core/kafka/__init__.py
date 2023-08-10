@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from confluent_kafka import Producer
 
 class KafkaConfig(BaseModel):
-    bootstrap_servers: str = "localhost:9092"
+    bootstrap_servers: str = "10.244.0.7:9092"
     topic_name: str = "topic-01"
 
     class Config:
