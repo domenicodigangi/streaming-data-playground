@@ -1,9 +1,7 @@
-import uvicorn
 from composer.core.event_publisher import EventPublisher
 from composer.core.time_series_generator import TimeSeriesConfig, TimeSeriesGenerator
 from fastapi import APIRouter, HTTPException
 import logging
-from typing import Optional
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")

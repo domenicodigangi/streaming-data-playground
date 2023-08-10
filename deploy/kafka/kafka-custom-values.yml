@@ -1,0 +1,12 @@
+service:
+  type: NodePort
+  sessionAffinity: None
+  ports:
+    - name: tcp-client
+      port: 9092
+      protocol: TCP
+      targetPort: kafka-client
+
+  ports:
+    interbroker: 9094
+    client: 9092
