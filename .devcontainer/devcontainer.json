@@ -3,27 +3,30 @@
 {
     "name": "Streaming anomaly detection workspace",
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-    "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu-20.04",
     "args": {
         "USERNAME": "vscode",
         "BUILDKIT_INLINE_CACHE": "0"
     },
     "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "enableNonRootDocker": "true",
+            "moby": "true",
+            "runArgs": [
+                "--init"
+            ]
+        },
         "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
             "version": "1.27.4",
             "helm": "3.12.3",
             "minikube": "1.31.1"
         },
+        "ghcr.io/devcontainers-contrib/features/curl-apt-get:1": {},
+        "ghcr.io/akhildevelops/devcontainer-features/apt:0": {},
         "ghcr.io/devcontainers/features/python:1": {
             "version": "3.11"
         },
         "ghcr.io/devcontainers-contrib/features/poetry:2": {},
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {
-            "enableNonRootDocker": "true",
-            "moby": "true"
-        },
-        "ghcr.io/devcontainers-contrib/features/curl-apt-get:1": {},
-        "ghcr.io/akhildevelops/devcontainer-features/apt:0": {}
     },
     "customizations": {
         "vscode": {
