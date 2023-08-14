@@ -1,9 +1,13 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/kubernetes-helm-minikube
 {
-    "name": "Kubernetes - Minikube-in-Docker",
+    "name": "Streaming anomaly detection workspace",
     // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
     "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+    "args": {
+        "USERNAME": "vscode",
+        "BUILDKIT_INLINE_CACHE": "0"
+    },
     "features": {
         "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
             "version": "latest",
@@ -36,15 +40,18 @@
             ],
         }
     },
-    // "postStartCommand": "nohup bash -c 'minikube start &' > minikube.log 2>&1",
-    // "mounts": [
-    //     "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
-    // ]
+    "mounts": [
+        "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+    ],
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
     // "postCreateCommand": "kubectl version",
     // Use 'postStartCommand' to run commands after the container is created like starting minikube.
+    "postStartCommand": {
+        "change_ssh_conf_own": "sudo chmod 600 /home/vscode/.ssh/config",
+        "start_minikube": "nohup bash -c 'minikube start &' > minikube.log 2>&1",
+    }
     // Configure tool-specific properties.
     // "customizations": {},
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
