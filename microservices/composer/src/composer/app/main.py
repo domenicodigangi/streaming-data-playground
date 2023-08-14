@@ -3,10 +3,15 @@ import logging
 
 import uvicorn
 from composer.api.time_series import router as ts_router
-from composer.core.kafka_publisher import KafkaLoopPublisher
+from composer.core.publishers.log_publisher import LogsPublisher
+from composer.core.data_generators.gaussian_sampler import (
+    GaussianSampler,
+    GaussianSamplerParams,
+)
 from fastapi import FastAPI
 
-publisher = KafkaLoopPublisher()
+sampler = GaussianSampler()
+publisher = LogsPublisher()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -23,14 +28,14 @@ app.include_router(ts_router, prefix="/v1/time_series")
 
 
 @app.post("/set_params")
-async def set_params(new_mean: float, new_variance: float):
-    publisher.sampler.set_params(new_mean, new_variance)
-    return {"message": "Parameters updated", "mean": new_mean, "variance": new_variance}
+async def set_params(new_params: GaussianSamplerParams):
+    sampler.set_params(new_params)
+    return {"message": f"Parameters updated to {new_params}"}
 
 
 @app.on_event("startup")
 async def startup_event():
-    asyncio.create_task(publisher.publish_loop())
+    asyncio.create_task(publisher.publish_loop(sampler))
 
 
 def main():
