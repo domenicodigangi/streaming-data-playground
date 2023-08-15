@@ -17,7 +17,7 @@ spec:
         tls: true
       - name: external1
         port: 9094
-        type: route
+        type: nodeport
         tls: true
         authentication:
           type: tls
