@@ -21,12 +21,12 @@ class AbstractPeriodicMsgPublisher(ABC):
         while True:
             msg = self.get_msg_from_sampler(sampler)
             self.publish_one(msg)
-            await asyncio.sleep(sampler.interval)
+            await asyncio.sleep(sampler.params.interval_sec)
 
     def get_msg_from_sampler(self, sampler: GaussianSampler) -> bytes:
         value = sampler.sample_one()
         msg_str = "{" + f"{self._config.value_key}{value}" + "}"
-        return bytes(msg_str)
+        return msg_str.encode("utf-8")
 
     def publish_one(self, msg: bytes):
         raise NotImplementedError()

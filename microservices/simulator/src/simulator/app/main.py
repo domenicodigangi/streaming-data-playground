@@ -2,7 +2,8 @@ import asyncio
 import logging
 
 import uvicorn
-from simulator.api.time_series import router as ts_router
+
+# from simulator.api.time_series import router as ts_router
 from simulator.core.publishers.log_publisher import LogsPublisher
 from simulator.core.data_generators.gaussian_sampler import (
     GaussianSampler,
@@ -24,7 +25,7 @@ async def read_root():
     return {"message": "simulator data sampler is running"}
 
 
-app.include_router(ts_router, prefix="/v1/time_series")
+# app.include_router(ts_router, prefix="/v1/time_series")
 
 
 @app.post("/set_params")

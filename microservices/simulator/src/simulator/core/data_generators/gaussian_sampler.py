@@ -18,10 +18,10 @@ class GaussianSamplerParams(BaseModel):
 
 class GaussianSampler:
     def __init__(self, params: GaussianSamplerParams | None = None):
-        self._params = params or GaussianSamplerParams()
+        self.params = params or GaussianSamplerParams()
 
     def sample_one(self):
-        sampled_value = random.gauss(self._params.mean, self._params.variance**0.5)
+        sampled_value = random.gauss(self.params.mean, self.params.variance**0.5)
         logger.info(f"Sampled value: {sampled_value}")
         return sampled_value
 
