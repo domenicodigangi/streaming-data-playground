@@ -1,9 +1,9 @@
 import asyncio
 import logging
-from composer.core.data_generators.gaussian_sampler import GaussianSampler
+from simulator.core.data_generators.gaussian_sampler import GaussianSampler
 from kafka import KafkaProducer
 from pydantic import BaseModel
-from composer.core.publishers.abstract_publisher import (
+from simulator.core.publishers.abstract_publisher import (
     AbstractPeriodicMsgPublisher,
     PublisherConfig,
 )

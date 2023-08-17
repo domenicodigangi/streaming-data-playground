@@ -18,4 +18,4 @@ ENV KAFKA_BOOTSTRAP_SERVERS=kafka.default.svc.cluster.local:9092
 # Add other environment variables as needed
 
 # Run the FastAPI app
-CMD ["uvicorn", "composer:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "simulator:app", "--host", "0.0.0.0", "--port", "8000"]

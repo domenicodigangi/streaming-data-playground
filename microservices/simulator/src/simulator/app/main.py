@@ -2,9 +2,9 @@ import asyncio
 import logging
 
 import uvicorn
-from composer.api.time_series import router as ts_router
-from composer.core.publishers.log_publisher import LogsPublisher
-from composer.core.data_generators.gaussian_sampler import (
+from simulator.api.time_series import router as ts_router
+from simulator.core.publishers.log_publisher import LogsPublisher
+from simulator.core.data_generators.gaussian_sampler import (
     GaussianSampler,
     GaussianSamplerParams,
 )
@@ -21,7 +21,7 @@ app = FastAPI()
 
 @app.get("/")
 async def read_root():
-    return {"message": "Composer data sampler is running"}
+    return {"message": "simulator data sampler is running"}
 
 
 app.include_router(ts_router, prefix="/v1/time_series")

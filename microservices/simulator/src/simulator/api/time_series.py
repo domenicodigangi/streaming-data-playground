@@ -1,8 +1,8 @@
-from composer.core.data_generators.time_series_generator import (
+from simulator.core.data_generators.time_series_generator import (
     TimeSeriesConfig,
     TimeSeriesGenerator,
 )
-from composer.core.kafka_publisher import KafkaPublisher
+from simulator.core.kafka_publisher import KafkaPublisher
 from fastapi import APIRouter, HTTPException
 import logging
 

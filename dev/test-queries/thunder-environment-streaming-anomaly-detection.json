@@ -5,11 +5,11 @@
     "version": "1.0",
     "variables": [
         {
-            "name": "HOST_COMPOSER",
+            "name": "HOST_simulator",
             "value": "http://localhost"
         },
         {
-            "name": "PORT_COMPOSER",
+            "name": "PORT_simulator",
             "value": "8001"
         }
     ]
