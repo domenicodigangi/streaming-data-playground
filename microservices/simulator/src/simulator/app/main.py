@@ -4,7 +4,7 @@ import logging
 import uvicorn
 
 # from simulator.api.time_series import router as ts_router
-from simulator.core.publishers.log_publisher import LogsPublisher
+from simulator.core.publishers.kafka_publisher import KafkaPublisher
 from simulator.core.data_generators.gaussian_sampler import (
     GaussianSampler,
     GaussianSamplerParams,
@@ -12,7 +12,7 @@ from simulator.core.data_generators.gaussian_sampler import (
 from fastapi import FastAPI
 
 sampler = GaussianSampler()
-publisher = LogsPublisher()
+publisher = KafkaPublisher()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
