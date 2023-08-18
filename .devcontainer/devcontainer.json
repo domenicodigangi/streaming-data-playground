@@ -53,7 +53,7 @@
     // Use 'postStartCommand' to run commands after the container is created like starting minikube.
     "postStartCommand": {
         "change_ssh_conf_own": "sudo chmod 600 /home/vscode/.ssh/config",
-        "start_minikube": "deploy/start/start_minikube.sh",
+        "start_minikube": ". deploy/start/start_minikube.sh",
     }
     // Configure tool-specific properties.
     // "customizations": {},
