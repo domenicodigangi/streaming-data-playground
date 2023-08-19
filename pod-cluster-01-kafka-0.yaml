@@ -1,0 +1,260 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    strimzi.io/broker-configuration-hash: d88825d9
+    strimzi.io/clients-ca-cert-generation: "0"
+    strimzi.io/cluster-ca-cert-generation: "0"
+    strimzi.io/cluster-ca-key-generation: "0"
+    strimzi.io/inter-broker-protocol-version: "3.5"
+    strimzi.io/kafka-version: 3.5.1
+    strimzi.io/log-message-format-version: "3.5"
+    strimzi.io/logging-appenders-hash: e893ac9f
+    strimzi.io/revision: fca073c4
+    strimzi.io/server-cert-hash: f822dbb348ac647bd54dff10b7966cbca8a6662c
+  creationTimestamp: "2023-08-19T08:46:49Z"
+  labels:
+    app.kubernetes.io/instance: cluster-01
+    app.kubernetes.io/managed-by: strimzi-cluster-operator
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: strimzi-cluster-01
+    statefulset.kubernetes.io/pod-name: cluster-01-kafka-0
+    strimzi.io/broker-role: "true"
+    strimzi.io/cluster: cluster-01
+    strimzi.io/component-type: kafka
+    strimzi.io/controller: strimzipodset
+    strimzi.io/controller-name: cluster-01-kafka
+    strimzi.io/controller-role: "false"
+    strimzi.io/kind: Kafka
+    strimzi.io/name: cluster-01-kafka
+    strimzi.io/pod-name: cluster-01-kafka-0
+    strimzi.io/pool-name: kafka
+  name: cluster-01-kafka-0
+  namespace: kafka
+  ownerReferences:
+  - apiVersion: core.strimzi.io/v1beta2
+    blockOwnerDeletion: false
+    controller: true
+    kind: StrimziPodSet
+    name: cluster-01-kafka
+    uid: e9af3c53-ccef-4dfa-8c75-1f98ac6de2c8
+  resourceVersion: "13861"
+  uid: bf2a9c08-5977-4533-8cce-138e3b0ff52c
+spec:
+  affinity: {}
+  containers:
+  - args:
+    - /opt/kafka/kafka_run.sh
+    env:
+    - name: KAFKA_METRICS_ENABLED
+      value: "false"
+    - name: STRIMZI_KAFKA_GC_LOG_ENABLED
+      value: "false"
+    - name: KAFKA_HEAP_OPTS
+      value: -Xms128M
+    image: quay.io/strimzi/kafka:0.36.1-kafka-3.5.1
+    imagePullPolicy: IfNotPresent
+    livenessProbe:
+      exec:
+        command:
+        - /opt/kafka/kafka_liveness.sh
+      failureThreshold: 3
+      initialDelaySeconds: 15
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    name: kafka
+    ports:
+    - containerPort: 9090
+      name: tcp-ctrlplane
+      protocol: TCP
+    - containerPort: 9091
+      name: tcp-replication
+      protocol: TCP
+    - containerPort: 9092
+      name: tcp-clients
+      protocol: TCP
+    - containerPort: 9093
+      name: tcp-clientstls
+      protocol: TCP
+    - containerPort: 9094
+      name: tcp-external
+      protocol: TCP
+    readinessProbe:
+      exec:
+        command:
+        - /opt/kafka/kafka_readiness.sh
+      failureThreshold: 3
+      initialDelaySeconds: 15
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 5
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/lib/kafka/data
+      name: data
+    - mountPath: /tmp
+      name: strimzi-tmp
+    - mountPath: /opt/kafka/cluster-ca-certs
+      name: cluster-ca
+    - mountPath: /opt/kafka/broker-certs
+      name: broker-certs
+    - mountPath: /opt/kafka/client-ca-certs
+      name: client-ca-cert
+    - mountPath: /opt/kafka/custom-config/
+      name: kafka-metrics-and-logging
+    - mountPath: /var/opt/kafka
+      name: ready-files
+    - mountPath: /opt/kafka/init
+      name: rack-volume
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-kjxwj
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostname: cluster-01-kafka-0
+  initContainers:
+  - args:
+    - /opt/strimzi/bin/kafka_init_run.sh
+    env:
+    - name: NODE_NAME
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: spec.nodeName
+    - name: EXTERNAL_ADDRESS
+      value: "TRUE"
+    image: quay.io/strimzi/operator:0.36.1
+    imagePullPolicy: IfNotPresent
+    name: kafka-init
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /opt/kafka/init
+      name: rack-volume
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-kjxwj
+      readOnly: true
+  nodeName: minikube
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: cluster-01-kafka
+  serviceAccountName: cluster-01-kafka
+  subdomain: cluster-01-kafka-brokers
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - emptyDir: {}
+    name: data
+  - emptyDir:
+      medium: Memory
+      sizeLimit: 1Mi
+    name: rack-volume
+  - emptyDir:
+      medium: Memory
+      sizeLimit: 5Mi
+    name: strimzi-tmp
+  - name: cluster-ca
+    secret:
+      defaultMode: 292
+      secretName: cluster-01-cluster-ca-cert
+  - name: broker-certs
+    secret:
+      defaultMode: 292
+      secretName: cluster-01-kafka-brokers
+  - name: client-ca-cert
+    secret:
+      defaultMode: 292
+      secretName: cluster-01-clients-ca-cert
+  - configMap:
+      defaultMode: 420
+      name: cluster-01-kafka-0
+    name: kafka-metrics-and-logging
+  - emptyDir:
+      medium: Memory
+      sizeLimit: 1Ki
+    name: ready-files
+  - name: kube-api-access-kjxwj
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2023-08-19T08:46:51Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2023-08-19T08:47:09Z"
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2023-08-19T08:47:09Z"
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2023-08-19T08:46:49Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://a1c5765f3f6f5b0a7dc443c5b1805cde44332b5410d5febcbb3c8a13cd73d223
+    image: quay.io/strimzi/kafka:0.36.1-kafka-3.5.1
+    imageID: docker-pullable://quay.io/strimzi/kafka@sha256:ea35817ff1ef295c682d70562f209ef658fcd87c61f467a4549d7a2f39e71700
+    lastState: {}
+    name: kafka
+    ready: true
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2023-08-19T08:46:51Z"
+  hostIP: 192.168.49.2
+  initContainerStatuses:
+  - containerID: docker://e13fe1a16c8a5e0ee2089b0ddcb737e4a3fa21200349462577fcbcaa727c87f4
+    image: quay.io/strimzi/operator:0.36.1
+    imageID: docker-pullable://quay.io/strimzi/operator@sha256:e9e03b31007c0f9b67a6a33e6b644e8c1ba35bd9976804ee3d22a04e4bf511b1
+    lastState: {}
+    name: kafka-init
+    ready: true
+    restartCount: 0
+    state:
+      terminated:
+        containerID: docker://e13fe1a16c8a5e0ee2089b0ddcb737e4a3fa21200349462577fcbcaa727c87f4
+        exitCode: 0
+        finishedAt: "2023-08-19T08:46:51Z"
+        reason: Completed
+        startedAt: "2023-08-19T08:46:49Z"
+  phase: Running
+  podIP: 10.244.0.56
+  podIPs:
+  - ip: 10.244.0.56
+  qosClass: BestEffort
+  startTime: "2023-08-19T08:46:49Z"

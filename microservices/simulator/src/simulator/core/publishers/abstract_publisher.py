@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class PublisherConfig(BaseModel):
-    value_key: str = "value_01: "
+    value_key: str = '"value_01": '
 
 
 class AbstractPeriodicMsgPublisher(ABC):

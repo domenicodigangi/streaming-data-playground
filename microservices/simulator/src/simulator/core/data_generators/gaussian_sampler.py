@@ -22,7 +22,7 @@ class GaussianSampler:
 
     def sample_one(self):
         sampled_value = random.gauss(self.params.mean, self.params.variance**0.5)
-        logger.info(f"Sampled value: {sampled_value}")
+        logger.debug(f"Sampled value: {sampled_value}")
         return sampled_value
 
     def set_params(self, params: GaussianSamplerParams):

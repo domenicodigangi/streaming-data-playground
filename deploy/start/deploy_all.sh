@@ -13,7 +13,7 @@ echo "Deploying Kafka..."
 
 # Deploy Kafka UI
 echo "Deploying Kafka UI..."
-. deploy/kafka/helm_based/kafka-ui-deploy.sh
+. deploy/kafka/helm_based_ui/kafka-ui-deploy.sh 
 
 # Deploy Grafana
 echo "Deploying and forwarding Grafana ports..."

@@ -25,6 +25,6 @@ kubectl apply -f "$SCRIPT_DIR/kafka-ui-service.yml"
 
 echo "Setting up port forwarding for Kafka UI..."
 lsof -t -i :3001 | xargs kill || true
-nohup kubectl port-forward -n $NAMESPACE deployment/$KAFKA_UI_DEPLOYMENT_NAME 3001:8080 || true &
+nohup kubectl port-forward -n $NAMESPACE deployment/$KAFKA_UI_DEPLOYMENT_NAME 8080:8080 > port_forward_kafka-ui.log || true &
 
 echo "Script execution completed."
