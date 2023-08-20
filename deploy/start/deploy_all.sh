@@ -4,16 +4,9 @@
 echo "Starting deployment script..."
 
 # Deploy the Strimzi Operator
-echo "Deploying Strimzi Operator..."
-. deploy/kafka/strimzi_operator_based/deploy_strimzi_operator.sh 
+echo "Deploying All Kafka related resources..."
+. deploy/kafka/start-cluster-and-ui.sh
 
-# Deploy Kafka
-echo "Deploying Kafka..."
-. deploy/kafka/strimzi_operator_based/deploy_kafka.sh 
-
-# Deploy Kafka UI
-echo "Deploying Kafka UI..."
-. deploy/kafka/helm_based_ui/kafka-ui-deploy.sh 
 
 # Deploy Grafana
 echo "Deploying and forwarding Grafana ports..."
