@@ -15,4 +15,4 @@ echo "Deploying Kafka UI..."
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . ${SCRIPT_DIR}/helm_based_ui/kafka-ui-deploy.sh 
 
-cd INIT_DIR
+cd $INIT_DIR
