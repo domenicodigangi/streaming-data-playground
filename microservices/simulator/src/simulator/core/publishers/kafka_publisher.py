@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class KafkaConfig(PublisherConfig):
-    bootstrap_servers: str = "192.168.49.2:31030"
+    # update the following using the minikube cluster ip from minikube ip and the port from  kubectl get service cluster-01-kafka-external1-bootstrap -o=jsonpath='{.spec.ports[0].nodePort}{"\n"}' -n kafka
+    bootstrap_servers: str = "192.168.49.2:30365"
     topic: str = "topic-01"
 
 
