@@ -14,6 +14,6 @@ cd $INIT_DIR
 # Deploy Kafka UI
 echo "Deploying Kafka UI..."
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. ${SCRIPT_DIR}/kafka-ui-deploy.sh 
+. ${SCRIPT_DIR}/deploy-kafka-ui.sh 
 
 cd $INIT_DIR

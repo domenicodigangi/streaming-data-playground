@@ -4,8 +4,6 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "Running in $SCRIPT_DIR"
 
-# Create the namespace if it doesn't exist
-kubectl get namespace kafka || kubectl create namespace kafka
 
 # Apply the Strimzi installation YAML
 kubectl apply -f "$SCRIPT_DIR/strimzy-operator-namespace-kafka.yml" -n kafka
