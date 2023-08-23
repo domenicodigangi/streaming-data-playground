@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class KafkaConfig(PublisherConfig):
-    bootstrap_servers: str = "192.168.49.2:31191"
+    bootstrap_servers: str = "192.168.49.2:31030"
     topic: str = "topic-01"
 
 

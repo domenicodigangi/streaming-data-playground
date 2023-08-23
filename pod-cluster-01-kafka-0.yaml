@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   annotations:
-    strimzi.io/broker-configuration-hash: d88825d9
+    strimzi.io/broker-configuration-hash: 9dfbb3ec
     strimzi.io/clients-ca-cert-generation: "0"
     strimzi.io/cluster-ca-cert-generation: "0"
     strimzi.io/cluster-ca-key-generation: "0"
@@ -10,9 +10,9 @@ metadata:
     strimzi.io/kafka-version: 3.5.1
     strimzi.io/log-message-format-version: "3.5"
     strimzi.io/logging-appenders-hash: e893ac9f
-    strimzi.io/revision: fca073c4
-    strimzi.io/server-cert-hash: f822dbb348ac647bd54dff10b7966cbca8a6662c
-  creationTimestamp: "2023-08-19T08:46:49Z"
+    strimzi.io/revision: "264654e5"
+    strimzi.io/server-cert-hash: d3e407bdaa9b6d0dcb2e8e7610d702aa6dd4a940
+  creationTimestamp: "2023-08-21T20:18:30Z"
   labels:
     app.kubernetes.io/instance: cluster-01
     app.kubernetes.io/managed-by: strimzi-cluster-operator
@@ -37,9 +37,9 @@ metadata:
     controller: true
     kind: StrimziPodSet
     name: cluster-01-kafka
-    uid: e9af3c53-ccef-4dfa-8c75-1f98ac6de2c8
-  resourceVersion: "13861"
-  uid: bf2a9c08-5977-4533-8cce-138e3b0ff52c
+    uid: d6aef2b6-cdfe-4ce0-a8d9-9cc0ff5f7d56
+  resourceVersion: "54341"
+  uid: 74b76f6c-8e4c-4bfd-94b0-b6c0b593a987
 spec:
   affinity: {}
   containers:
@@ -110,7 +110,7 @@ spec:
     - mountPath: /opt/kafka/init
       name: rack-volume
     - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-      name: kube-api-access-kjxwj
+      name: kube-api-access-bqf6x
       readOnly: true
   dnsPolicy: ClusterFirst
   enableServiceLinks: true
@@ -136,7 +136,7 @@ spec:
     - mountPath: /opt/kafka/init
       name: rack-volume
     - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-      name: kube-api-access-kjxwj
+      name: kube-api-access-bqf6x
       readOnly: true
   nodeName: minikube
   preemptionPolicy: PreemptLowerPriority
@@ -188,7 +188,7 @@ spec:
       medium: Memory
       sizeLimit: 1Ki
     name: ready-files
-  - name: kube-api-access-kjxwj
+  - name: kube-api-access-bqf6x
     projected:
       defaultMode: 420
       sources:
@@ -209,23 +209,23 @@ spec:
 status:
   conditions:
   - lastProbeTime: null
-    lastTransitionTime: "2023-08-19T08:46:51Z"
+    lastTransitionTime: "2023-08-21T20:18:34Z"
     status: "True"
     type: Initialized
   - lastProbeTime: null
-    lastTransitionTime: "2023-08-19T08:47:09Z"
+    lastTransitionTime: "2023-08-21T20:18:51Z"
     status: "True"
     type: Ready
   - lastProbeTime: null
-    lastTransitionTime: "2023-08-19T08:47:09Z"
+    lastTransitionTime: "2023-08-21T20:18:51Z"
     status: "True"
     type: ContainersReady
   - lastProbeTime: null
-    lastTransitionTime: "2023-08-19T08:46:49Z"
+    lastTransitionTime: "2023-08-21T20:18:30Z"
     status: "True"
     type: PodScheduled
   containerStatuses:
-  - containerID: docker://a1c5765f3f6f5b0a7dc443c5b1805cde44332b5410d5febcbb3c8a13cd73d223
+  - containerID: docker://47d647301d31f1edd88fd587a298ec319fc0a12a78cd2298d9e8f122a3398e2d
     image: quay.io/strimzi/kafka:0.36.1-kafka-3.5.1
     imageID: docker-pullable://quay.io/strimzi/kafka@sha256:ea35817ff1ef295c682d70562f209ef658fcd87c61f467a4549d7a2f39e71700
     lastState: {}
@@ -235,10 +235,10 @@ status:
     started: true
     state:
       running:
-        startedAt: "2023-08-19T08:46:51Z"
+        startedAt: "2023-08-21T20:18:35Z"
   hostIP: 192.168.49.2
   initContainerStatuses:
-  - containerID: docker://e13fe1a16c8a5e0ee2089b0ddcb737e4a3fa21200349462577fcbcaa727c87f4
+  - containerID: docker://55220bc91cd44719e12d3355653e0c3abd7fcbe9c39e8e0c58d80917cf30d337
     image: quay.io/strimzi/operator:0.36.1
     imageID: docker-pullable://quay.io/strimzi/operator@sha256:e9e03b31007c0f9b67a6a33e6b644e8c1ba35bd9976804ee3d22a04e4bf511b1
     lastState: {}
@@ -247,14 +247,15 @@ status:
     restartCount: 0
     state:
       terminated:
-        containerID: docker://e13fe1a16c8a5e0ee2089b0ddcb737e4a3fa21200349462577fcbcaa727c87f4
+        containerID: docker://55220bc91cd44719e12d3355653e0c3abd7fcbe9c39e8e0c58d80917cf30d337
         exitCode: 0
-        finishedAt: "2023-08-19T08:46:51Z"
+        finishedAt: "2023-08-21T20:18:33Z"
         reason: Completed
-        startedAt: "2023-08-19T08:46:49Z"
+        startedAt: "2023-08-21T20:18:32Z"
   phase: Running
-  podIP: 10.244.0.56
+  podIP: 10.244.0.123
   podIPs:
-  - ip: 10.244.0.56
+  - ip: 10.244.0.123
   qosClass: BestEffort
-  startTime: "2023-08-19T08:46:49Z"
+  startTime: "2023-08-21T20:18:30Z"
+stop

@@ -8,11 +8,11 @@ echo "Running in $SCRIPT_DIR"
 # Deploy Kafka
 echo "Deploying Kafka..."
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. ${SCRIPT_DIR}/strimzi_operator_based/deploy_kafka.sh 
+. ${SCRIPT_DIR}/deploy_kafka.sh 
 
 # Deploy Kafka UI
 echo "Deploying Kafka UI..."
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-. ${SCRIPT_DIR}/helm_based_ui/kafka-ui-deploy.sh 
+. ${SCRIPT_DIR}/kafka-ui-deploy.sh 
 
 cd $INIT_DIR
