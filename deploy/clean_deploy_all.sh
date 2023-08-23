@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 INIT_DIR=$(pwd)
 
 # Log the start of the script

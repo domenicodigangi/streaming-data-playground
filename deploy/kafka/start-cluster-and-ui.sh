@@ -9,6 +9,7 @@ echo "Running in $SCRIPT_DIR"
 echo "Deploying Kafka..."
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 . ${SCRIPT_DIR}/deploy_kafka.sh 
+cd $INIT_DIR
 
 # Deploy Kafka UI
 echo "Deploying Kafka UI..."
