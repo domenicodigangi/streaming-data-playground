@@ -49,7 +49,11 @@
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
-    // "postCreateCommand": "kubectl version",
+    "postCreateCommand": {
+        "install_pyenv": "deploy/start/install_pyenv.sh",
+        "install_pyhon_versions": "deploy/start/install-required-python-versions.sh",
+        "install_java": "deploy/start/install-java.sh",
+    },
     // Use 'postStartCommand' to run commands after the container is created like starting minikube.
     "postStartCommand": {
         "change_ssh_conf_own": "sudo chmod 600 /home/vscode/.ssh/config",
