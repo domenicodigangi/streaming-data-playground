@@ -2,11 +2,34 @@ from pyflink.common.serialization import SimpleStringSchema
 from pyflink.common.typeinfo import Types
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.datastream.connectors import FlinkKafkaConsumer
+from pyflink.common import Configuration
+from typing import Union
+import os
+from pyflink.datastream import StreamExecutionEnvironment
+
+JAR_DEP_FOLDER = (
+    "/workspaces/streaming-anomaly-detection/microservices/flink/jar-dependencies"
+)
+
+
+def add_jars_in_folder_to_flink_env(
+    env: StreamExecutionEnvironment, folder_path: Union[str, os.PathLike]
+) -> None:
+    jar_files = []
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".jar"):
+            jar_files.append(f"file://{os.path.join(folder_path, filename)}")
+
+    if jar_files:
+        env.add_jars(*jar_files)
 
 
 def kafka_consumer_example():
     # Create a StreamExecutionEnvironment
     env = StreamExecutionEnvironment.get_execution_environment()
+
+    # Call the function to add all JAR files in the given folder
+    add_jars_in_folder_to_flink_env(env, JAR_DEP_FOLDER)
 
     # Create a Kafka consumer
     kafka_props = {
