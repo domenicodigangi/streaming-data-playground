@@ -33,7 +33,7 @@ def kafka_consumer_example():
 
     # Create a Kafka consumer
     kafka_props = {
-        "bootstrap.servers": "localhost:9092",  # Adjust the address to your Kafka broker
+        "bootstrap.servers": "192.168.49.2:30818",  # Adjust the address to your Kafka broker
         "group.id": "my-group",
     }
 
