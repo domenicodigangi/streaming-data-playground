@@ -24,7 +24,7 @@ class AbstractPeriodicMsgPublisher(ABC):
 
     def get_msg_from_sampler(self, sampler: GaussianSampler) -> bytes:
         value = sampler.sample_one()
-        msg_str = "{" + f"{self._config.value_key}{value}" + "}"
+        msg_str = '{"source_id": 0, ' + f"{self._config.value_key}{value}" + "}"
         return msg_str.encode("utf-8")
 
     def publish_one(self, msg: bytes):

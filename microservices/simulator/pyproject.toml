@@ -9,7 +9,7 @@ description = "Simulate periodic random data with anomalies"
 authors = ["Domenico Di Gangi <digangidomenico@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10.6"
+python = "^3.11"
 fastapi = "^0.101.0"
 uvicorn = "^0.23.2"
 kafka-python = "^2.0.2"
