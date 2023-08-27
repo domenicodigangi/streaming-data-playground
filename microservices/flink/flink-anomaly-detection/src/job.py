@@ -1,11 +1,11 @@
-from pyflink.common.serialization import SimpleStringSchema
+from pyflink.common.serialization import JsonRowDeserializationSchema
 from pyflink.common.typeinfo import Types
 from pyflink.datastream import StreamExecutionEnvironment
 from pyflink.datastream.connectors import FlinkKafkaConsumer
 from pyflink.common import Configuration
 from typing import Union
 import os
-from pyflink.datastream import StreamExecutionEnvironment
+from pyflink.common.typeinfo import Types
 
 JAR_DEP_FOLDER = (
     "/workspaces/streaming-anomaly-detection/microservices/flink/jar-dependencies"
@@ -36,10 +36,15 @@ def kafka_consumer_example():
         "bootstrap.servers": "192.168.49.2:30818",  # Adjust the address to your Kafka broker
         "group.id": "my-group",
     }
+    deserialization_schema = (
+        JsonRowDeserializationSchema.builder()
+        .type_info(type_info=Types.ROW([Types.DOUBLE()]))
+        .build()
+    )
 
     kafka_consumer = FlinkKafkaConsumer(
         "topic-01",
-        SimpleStringSchema(),
+        deserialization_schema,
         kafka_props,
     ).set_start_from_earliest()
 
