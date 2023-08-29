@@ -7,7 +7,7 @@ echo "Starting deployment script..."
 
 echo "Reset minikube"
 minikube delete
-. deploy/minikube/start_minikube.sh
+. deploy/start_minikube.sh
 cd ${INIT_DIR}
 
 
