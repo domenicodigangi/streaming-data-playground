@@ -27,6 +27,7 @@
             "version": "3.11"
         },
         "ghcr.io/devcontainers-contrib/features/poetry:2": {},
+        "ghcr.io/robbert229/devcontainer-features/opentofu:1": {},
     },
     "customizations": {
         "vscode": {
