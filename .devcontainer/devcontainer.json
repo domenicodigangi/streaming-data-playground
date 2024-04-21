@@ -51,15 +51,15 @@
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
     "postCreateCommand": {
-        "install_pyenv": "deploy/start/install_pyenv.sh",
-        "install_pyhon_versions": "deploy/start/install-required-python-versions.sh",
-        "install_java": "deploy/start/install-java.sh",
+        "install_pyenv": ".devcontainers/scripts/start/install_pyenv.sh",
+        "install_pyhon_versions": ".devcontainers/scripts/start/install-required-python-versions.sh",
+        "install_java": ".devcontainers/scripts/start/install-java.sh",
     },
-    // Use 'postStartCommand' to run commands after the container is created like starting minikube.
-    "postStartCommand": {
-        "change_ssh_conf_own": "sudo chmod 600 /home/vscode/.ssh/config",
-        "start_minikube": ". deploy/start/start_minikube.sh",
-    }
+    // // Use 'postStartCommand' to run commands after the container is created like starting minikube.
+    // "postStartCommand": {
+    //     "change_ssh_conf_own": "sudo chmod 600 /home/vscode/.ssh/config",
+    //     // "start_minikube": ". deploy/start/start_minikube.sh",
+    // }
     // Configure tool-specific properties.
     // "customizations": {},
     // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
