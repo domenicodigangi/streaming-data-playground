@@ -51,13 +51,10 @@
     // "forwardPorts": [],
     // Use 'postCreateCommand' to run commands after the container is created.
     // "postCreateCommand": {
-    //     "install_pyenv": ".devcontainers/scripts/install_pyenv.sh",
-    //     "install_pyhon_versions": ".devcontainers/scripts/install-required-python-versions.sh",
-    //     "install_java": ".devcontainers/scripts/install-java.sh",
     // },
     // // Use 'postStartCommand' to run commands after the container is created like starting minikube.
     "postStartCommand": {
-        "start_minikube": ". .devcontainer/scripts/start_minikube.sh",
+        // "start_minikube": ". .devcontainer/scripts/start_minikube.sh",
         // "change_ssh_conf_own": "sudo chmod 600 /home/vscode/.ssh/config",
     }
     // Configure tool-specific properties.
