@@ -7,7 +7,6 @@ echo "Running in $SCRIPT_DIR"
 # Variables
 NAMESPACE="kafka"
 KAFKA_UI_DEPLOYMENT_NAME="kafka-ui"
-KAFKA_TOPIC_NAME="topic-01"
 
 echo "Adding Kafka UI Helm repository..."
 helm repo add kafka-ui https://provectus.github.io/kafka-ui-charts

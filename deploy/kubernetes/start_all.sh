@@ -1,11 +1,34 @@
-. /workspaces/streaming-anomaly-detection/deploy/kubernetes/start_minikube.sh
+#!/bin/bash
 
-kubectl create -f https://github.com/jetstack/cert-manager/releases/download/v1.8.2/cert-manager.yaml
+# Function to print header with filename and timestamp
+print_header() {
+    filename="$1"
+    timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 
-minikube addons enable ingress
+    echo 
+    echo 
+    echo "=========================================================="
+    echo "Filename: $filename"
+    echo "Timestamp: $timestamp"
+    echo "=========================================================="
+    echo 
 
-kubectl create namespace minio-dev
+}
 
-kubectl apply -f minio/
+print_header "0_start_minikube.sh"
+. /workspaces/streaming-data-infra/deploy/kubernetes/0_start_minikube.sh
 
+print_header "1_setup_minikube.sh"
+. /workspaces/streaming-data-infra/deploy/kubernetes/1_setup_minikube.sh
+
+
+print_header "start-kafka-cluster-and-ui.sh"
+. /workspaces/streaming-data-infra/deploy/kubernetes/kafka/start-kafka-cluster-and-ui.sh
+
+print_header "start_minio.sh"
+. /workspaces/streaming-data-infra/deploy/kubernetes/minio/start_minio.sh
+
+print_header "start_flink.sh"
 . /workspaces/streaming-anomaly-detection/deploy/kubernetes/flink/start.sh
+
+

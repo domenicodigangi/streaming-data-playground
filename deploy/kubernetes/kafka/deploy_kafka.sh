@@ -4,8 +4,7 @@ INIT_DIR=$(pwd)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "Running in $SCRIPT_DIR"
 
-echo "Delete kafka namespace"
-kubectl delete namespace kafka
+
 
 # Create the namespace if it doesn't exist
 kubectl get namespace kafka || kubectl create namespace kafka
