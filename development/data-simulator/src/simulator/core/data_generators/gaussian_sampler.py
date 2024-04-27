@@ -1,34 +1,25 @@
-import asyncio
 import logging
 import random
-from pydantic import BaseModel
 
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from simulator.core.data_generators.abstract_sampler import (
+    AbstractSampler,
+    AbstractSamplerParams,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class GaussianSamplerParams(BaseModel):
+class GaussianSamplerParams(AbstractSamplerParams):
     mean: float = 0.1
     variance: float = 1.0
-    interval_sec: float = 0.5
 
 
-class GaussianSampler:
+class GaussianSampler(AbstractSampler):
     def __init__(self, params: GaussianSamplerParams | None = None):
-        self.params = params or GaussianSamplerParams()
+        super().__init__(params)
 
-    def sample_one(self):
+    def sample_one(self) -> float:
         sampled_value = random.gauss(self.params.mean, self.params.variance**0.5)
         logger.debug(f"Sampled value: {sampled_value}")
         return sampled_value
-
-    def set_params(self, params: GaussianSamplerParams):
-        self.params = params
-
-    async def sample_loop(self):
-        while True:
-            sampled_value = self.sample_one()
-            await asyncio.sleep(self.params.interval)
