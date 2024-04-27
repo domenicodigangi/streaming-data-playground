@@ -1,0 +1,1 @@
+kubectl create -f /workspaces/streaming-anomaly-detection/flink/flink-kubernetes-operator/examples/basic.yaml
