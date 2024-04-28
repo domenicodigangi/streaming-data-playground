@@ -10,13 +10,14 @@ poetry install
 poetry run simulator
 ```
 
-## To ssh into codespace from windows
-```bash
-Host cs.opulent-meme-4prvjrpvpv27p7x.main
-        User root
-        ProxyCommand C:\Program Files\GitHub CLI\gh.exe cs ssh -c opulent-meme-4prvjrpvpv27p7x --stdio -- -i C:\Users\<user-name>\.ssh\id_rsa
+## To ssh into codespace (useful for remote development wih pycharm)
+Example for windows
+```PowerShell
+Host cs.special-waddle-4prvjrp54v27wxg.main
+        User vscode
+        ProxyCommand C:\Program Files\GitHub CLI\gh.exe cs ssh -c special-waddle-4prvjrp54v27wxg --stdio -- -i C:\Users\<username>\.ssh\codespaces.jetbrains
         UserKnownHostsFile=/dev/null
         StrictHostKeyChecking no
         LogLevel quiet
         ControlMaster auto
-        IdentityFile C:\Users\<user-name>\.ssh\id_rsa
+        IdentityFile C:\Users\<username>\.ssh\codespaces.jetbrains
