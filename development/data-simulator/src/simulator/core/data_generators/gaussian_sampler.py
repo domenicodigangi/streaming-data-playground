@@ -22,5 +22,5 @@ class GaussianSampler(AbstractSampler):
 
     def sample_one(self) -> float:
         sampled_value = random.gauss(self.params.mean, self.params.variance**0.5)
-        logger.debug(f"Sampled value: {sampled_value}")
+        logger.debug("Sampled value: %s", sampled_value)
         return sampled_value

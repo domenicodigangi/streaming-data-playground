@@ -43,7 +43,9 @@
                 "donjayamanne.githistory",
                 "mhutchie.git-graph",
                 "rangav.vscode-thunder-client",
-            ],
+                "usernamehw.errorlens",
+                "charliermarsh.ruff"
+            ]
         }
     },
     "mounts": [

@@ -2,10 +2,8 @@ import os
 
 import numpy as np
 import pandas as pd
-import uvicorn
-from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-
+ 
 
 class TimeSeriesConfig(BaseModel):
     initial_timestamp: str = "2022-01-01"
