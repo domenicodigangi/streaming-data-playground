@@ -18,6 +18,7 @@ class GaussianSamplerParams(AbstractSamplerParams):
 class GaussianSampler(AbstractSampler):
     def __init__(self, params: GaussianSamplerParams | None = None):
         super().__init__(params)
+        self.params = params or GaussianSamplerParams()
 
     def sample_one(self) -> float:
         sampled_value = random.gauss(self.params.mean, self.params.variance**0.5)
