@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/streaming-data-infra.iml" filepath="$PROJECT_DIR$/.idea/streaming-data-infra.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/streaming-data-development-env.iml" filepath="$PROJECT_DIR$/.idea/streaming-data-development-env.iml" />
     </modules>
   </component>
 </project>
