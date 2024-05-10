@@ -16,6 +16,7 @@ kafka-python = "^2.0.2"
 numpy = "^1.25.2"
 pandas = "^2.0.3"
 pydantic = "^2.1.1"
+tenacity = "^8.3.0"
 
 [tool.poetry.scripts]
 simulator = "simulator.app.main:main"

@@ -20,7 +20,7 @@ class GaussianSampler(AbstractSampler):
         super().__init__(params)
         self.params = params or GaussianSamplerParams()
 
-    def sample_one(self) -> float:
+    def sample_one_msg(self) -> str:
         sampled_value = random.gauss(self.params.mean, self.params.variance**0.5)
         logger.debug("Sampled value: %s", sampled_value)
-        return sampled_value
+        return f'{{"source_id": gaussian_sampler, "value": {sampled_value} }}'
