@@ -23,4 +23,9 @@ nohup.out
 */nohup.out
 *.out
 
+
+# Maven artifacts
+target/
 *.jar
+*.war
+*.ear
