@@ -1,0 +1,3 @@
+host: "localhost"
+port: 29092
+topic: "streamingad_simulated_data"
