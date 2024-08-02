@@ -1,0 +1,39 @@
+PUT streamingad_values
+{
+    "mappings": {
+      "properties": {
+        "source_id": {
+          "type": "text"
+        },
+        "timestamp": {
+          "type": "date",
+          "format" : "strict_date_optional_time||epoch_millis"
+        },
+        "value": {
+          "type": "double"
+        }
+      }
+    }
+}
+
+PUT streamingad_random_cut_score
+{
+    "mappings": {
+      "properties": {
+        "source_id": {
+          "type": "text"
+        },
+        "timestamp": {
+          "type": "date",
+          "format" : "strict_date_optional_time||epoch_millis"
+        },
+        "value": {
+          "type": "double"
+        },
+        "score_ad": {
+          "type": "double"
+        }
+
+      }
+    }
+}

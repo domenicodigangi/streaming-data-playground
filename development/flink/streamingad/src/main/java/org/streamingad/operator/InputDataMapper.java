@@ -21,4 +21,5 @@ package org.streamingad.operator;
 import org.apache.flink.api.common.functions.Function;
 
 @FunctionalInterface
-public interface InputDataMapper<T> extends Function, java.util.function.Function<T, float[]> {}
+public interface InputDataMapper<T> extends Function, java.util.function.Function<T, double[]> {
+}

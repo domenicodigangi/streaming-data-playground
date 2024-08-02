@@ -1,64 +1,63 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.streamingad.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.HashMap;
+
 public class OutputData {
-    private long time;
-    private float value;
-    private double score;
+    ObjectMapper mapper = new ObjectMapper();
+    @JsonProperty("source_id")
+    public String sourceId;
 
-    public OutputData(long time, float value, double score) {
-        this.time = time;
+    @JsonProperty("timestamp")
+    public long timestamp;
+
+    @JsonProperty("value")
+    public double value;
+
+    @JsonProperty("score_ad")
+    public double score_ad;
+
+    public OutputData() {
+        // Default constructor needed for Jackson deserialization
+    }
+
+    public OutputData(String sourceId, long timestamp, double value, double score_ad) {
+        this.sourceId = sourceId;
+        this.timestamp = timestamp;
         this.value = value;
-        this.score = score;
+        this.score_ad = score_ad;
     }
 
-    public long getTime() {
-        return time;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public float getValue() {
+    public double getValue() {
         return value;
     }
 
-    public void setValue(float value) {
-        this.value = value;
+    public long getTimestamp() {
+        return timestamp;
     }
 
-    public double getScore() {
-        return score;
+    public OutputData(String jsonSerialized) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            OutputData deserialized = mapper.readValue(jsonSerialized, OutputData.class);
+            this.sourceId = deserialized.sourceId;
+            this.timestamp = deserialized.timestamp;
+            this.value = deserialized.value;
+            this.score_ad = deserialized.score_ad;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void setScore(double score) {
-        this.score = score;
+    public HashMap<String, ?> toHashMap() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("source_id", this.sourceId);
+        map.put("timestamp", this.timestamp);
+        map.put("value", this.value);
+        map.put("score_ad", this.score_ad);
+        return map;
     }
 
-    @Override
-    public String toString() {
-        return "OutputData{" +
-                "time=" + time +
-                ", value=" + value +
-                ", score=" + score +
-                '}';
-    }
 }

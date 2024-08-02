@@ -35,7 +35,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 public class RandomCutForestOperator<T, R> extends ProcessFunction<T, R> implements CheckpointedFunction {
-    public static final InputDataMapper<Float> SIMPLE_FLOAT_INPUT_DATA_MAPPER = (input) -> new float[]{input};
+    public static final InputDataMapper<Float> SIMPLE_FLOAT_INPUT_DATA_MAPPER = (input) -> new double[]{input};
     public static final ResultMapper<Float, Tuple2<Float, Double>> SIMPLE_TUPLE_RESULT_DATA_MAPPER = Tuple2::of;
 
     private transient RandomCutForest rcf;
@@ -76,7 +76,7 @@ public class RandomCutForestOperator<T, R> extends ProcessFunction<T, R> impleme
 
     @Override
     public void processElement(T value, ProcessFunction<T, R>.Context ctx, Collector<R> out) {
-        float[] inputData = inputDataMapper.apply(value);
+        double[] inputData = inputDataMapper.apply(value);
         Preconditions.checkArgument(inputData.length == dimensions);
 
         double score = rcf.getAnomalyScore(inputData);

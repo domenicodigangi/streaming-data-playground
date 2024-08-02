@@ -3,6 +3,8 @@ package org.streamingad.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.HashMap;
+
 public class InputData {
     ObjectMapper mapper = new ObjectMapper();
     @JsonProperty("source_id")
@@ -12,14 +14,18 @@ public class InputData {
     public long timestamp;
 
     @JsonProperty("value")
-    public float value;
+    public double value;
 
     public InputData() {
         // Default constructor needed for Jackson deserialization
     }
 
-    public float getValue() {
+    public double getValue() {
         return value;
+    }
+
+    public String getSourceID() {
+        return sourceId;
     }
 
     public long getTimestamp() {
@@ -38,5 +44,12 @@ public class InputData {
         }
     }
 
+    public HashMap<String, ?> toHashMap() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("source_id", this.sourceId);
+        map.put("timestamp", this.timestamp);
+        map.put("value", this.value);
+        return map;
+    }
 
 }

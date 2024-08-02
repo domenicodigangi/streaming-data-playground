@@ -124,9 +124,22 @@ services:
     networks:
       - opensearch-net
 
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - opensearch-net
+
+
 volumes:
   opensearch-data1:
   opensearch-data2:
+  grafana-storage: { }
 
 networks:
   opensearch-net:
