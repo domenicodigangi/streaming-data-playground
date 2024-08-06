@@ -49,8 +49,7 @@ class KafkaPublisher(AbstractPeriodicMsgPublisher):
         logger.info("Publishing message: %s", msg)
         self.producer.send(self._config.topic, value=msg)
         self.producer.flush()
-        self.producer.send(self._config.topic, value=msg)
-        self.producer.flush()
+
 
     @tenacity.retry(wait=tenacity.wait_exponential(multiplier=1, min=4, max=10))
     def get_producer(self):
