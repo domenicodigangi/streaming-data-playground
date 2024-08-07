@@ -87,29 +87,24 @@ def fetch_historical_data_from_kafka(topic: str, len_hist: int,
 
 
 async def streaming_charts():
-    # await input_data_chart()
+    kafka_topics = get_topics()
     st.session_state["min_to_show"] = st.slider(f"Minutes to show", 1, 60, 10)
-    await kafka_streaming_chart("streamingad_simulated_data", "value", "Input data",
-                                st.session_state["min_to_show"])
-    await kafka_streaming_chart("streamingad_output", "score_ad", "Anomaly score",
-                                st.session_state["min_to_show"])
+    data_1 = await kafka_streaming_chart(kafka_topics["simulated_data"], "value",
+                                         "Input data", st.session_state["min_to_show"])
+    data_2 = await kafka_streaming_chart(kafka_topics["anomaly_det_output_rcf"],
+                                         "score_ad", "Anomaly score",
+                                         st.session_state["min_to_show"])
 
-
-async def input_data_chart():
-    topic_name = "streamingad_simulated_data"
-    new_data = fetch_new_data_from_kafka(topic_name)
-    st.dataframe(new_data)
-    in_data = get_streaming_data_df(topic_name)
-    in_data = pd.concat([in_data, new_data])
-    set_streaming_data_df(topic_name, in_data)
-    st.session_state.minutes_to_show = st.slider("Minutes to show", 1, 60, 10)
-    plot_data = in_data.last(f"{st.session_state.minutes_to_show}min").reset_index()
-    plot_timeseries_plotly(plot_data, "value", "Input data")
+    if st.toggle("Show Streaming Data as table", False):
+        col_1, col_2 = st.columns(2)
+        with col_1:
+            st.dataframe(data_1)
+        with col_2:
+            st.dataframe(data_2)
 
 
 async def kafka_streaming_chart(topic_name: str, y_col: str, title: str, last_n_min: int):
     new_data = fetch_new_data_from_kafka(topic_name)
-    chart_key = f"show_data_{topic_name}_{title}"
 
     in_data = get_streaming_data_df(topic_name)
     in_data = pd.concat([in_data, new_data])
@@ -117,10 +112,7 @@ async def kafka_streaming_chart(topic_name: str, y_col: str, title: str, last_n_
 
     plot_data = in_data.last(f"{last_n_min} min").reset_index()
     plot_timeseries_plotly(plot_data, y_col, title)
-    st.toggle("Show Streaming Data as table", key=chart_key)
-
-    if st.session_state[chart_key]:
-        st.dataframe(new_data)
+    return plot_data
 
 
 def plot_timeseries_plotly(df_to_plot: pd.DataFrame, y_col: str, title: str,
@@ -146,8 +138,7 @@ def clear_all_cache():
     conn.flushdb()
 
 
-def set_cache_to_history(len_hist: int):
-    topic_name = "streamingad_simulated_data"
+def set_cache_to_history(topic_name: str, len_hist: int):
     historical_data = fetch_historical_data_from_kafka(topic_name, len_hist)
     st.write("Setting cache to historical data")
     set_streaming_data_df(f"{topic_name}", historical_data)
@@ -180,6 +171,12 @@ def stop_gaussian_sampler():
 @st.cache_data
 def get_base_simulator_url():
     return f"http://{st.secrets['SIMULATOR_HOST']}:{st.secrets['SIMULATOR_PORT']}/v1"
+
+
+@st.cache_data
+def get_topics():
+    return {"simulated_data": st.secrets['KAFKA_TOPIC_SIMULATED_DATA'],
+            "anomaly_det_output_rcf": st.secrets['KAFKA_TOPIC_ANOMALY_DETECTION_RCF']}
 
 
 st.title("Real Time Anomaly Detection on Streaming Data")
