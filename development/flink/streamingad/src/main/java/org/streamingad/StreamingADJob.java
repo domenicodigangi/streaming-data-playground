@@ -55,7 +55,7 @@ public class StreamingADJob {
         RandomCutForestOperator<InputData, OutputData> randomCutForestOperator =
                 RandomCutForestOperator.<InputData, OutputData>builder()
                         .setDimensions(1)
-                        .setShingleSize(1)
+                        .setShingleSize(10)
                         .setSampleSize(628)
                         .setInputDataMapper((inputData) -> new double[]{inputData.getValue()})
                         .setResultMapper(((inputData, score) -> new OutputData(inputData.getSourceID(), inputData.getTimestamp(), inputData.getValue(), score)))

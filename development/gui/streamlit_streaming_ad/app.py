@@ -5,12 +5,13 @@ import pickle
 from typing import Dict
 
 import altair as alt
-import httpx
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from kafka import KafkaConsumer, TopicPartition
 from redislite import Redis
+
+from custom_lib.simulator_helper import SimulatorHelper
 
 logger = logging.getLogger(__name__)
 
@@ -144,35 +145,6 @@ def set_cache_to_history(topic_name: str, len_hist: int):
     set_streaming_data_df(f"{topic_name}", historical_data)
 
 
-def simulator_settings():
-    st.session_state.simulator_msgs_per_sec = st.slider("Number of messages per second",
-                                                        1, 100, 10)
-    st.session_state.simulator_mean = st.slider("Mean", 0, 10, 1)
-    st.session_state.simulator_variance = st.slider("Variance", 0, 10, 1)
-
-
-def update_gaussian_sampler_simulator_settings():
-    base_url = get_base_simulator_url()
-    update_url = f"{base_url}/gaussian/gaussian_sampler/update"
-    interval_sec = 1 / st.session_state.simulator_msgs_per_sec
-    response = httpx.post(update_url, json={"mean": st.session_state.simulator_mean,
-                                            "variance": 
-                                                st.session_state.simulator_variance,
-                                            "interval_sec": interval_sec})
-
-
-def stop_gaussian_sampler():
-    base_url = get_base_simulator_url()
-    stop_url = f"{base_url}/gaussian/gaussian_sampler/stop"
-    response = httpx.post(stop_url)
-    return response
-
-
-@st.cache_data
-def get_base_simulator_url():
-    return f"http://{st.secrets['SIMULATOR_HOST']}:{st.secrets['SIMULATOR_PORT']}/v1"
-
-
 @st.cache_data
 def get_topics():
     return {"simulated_data": st.secrets['KAFKA_TOPIC_SIMULATED_DATA'],
@@ -196,22 +168,13 @@ with st.sidebar:
                          max_value=10_000, value=500, step=500)
     if st.button("Set cache to history"):
         set_cache_to_history(len_hist)
-
-    st.header("Simulator settings")
-    simulator_settings()
     col_1, col_2 = st.columns(2)
     with col_1:
-        if st.button("Start/Update simulator"):
-            update_gaussian_sampler_simulator_settings()
+        live = st.toggle("Live data", True)
     with col_2:
-        if st.button("Stop simulator"):
-            stop_gaussian_sampler()
+        st.button("Refresh")
 
-col_1, col_2 = st.columns(2)
-with col_1:
-    live = st.toggle("Live data", True)
-with col_2:
-    st.button("Refresh")
+    SimulatorHelper().show_simulator_tuning()
 
 if live:
     refreshing_fragment()
