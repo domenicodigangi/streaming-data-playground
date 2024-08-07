@@ -22,9 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.connector.base.DeliveryGuarantee;
+import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
+import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.connector.opensearch.sink.OpensearchSinkBuilder;
+import org.apache.flink.formats.json.JsonSerializationSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.http.HttpHost;
@@ -45,8 +49,8 @@ public class StreamingADJob {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        DataStream<InputData> inputStream = createSource(env);
-        sinkToOpensearch(inputStream.map(InputData::toHashMap), commonConfigOpensearch.VALUES_INDEX_NAME);
+        DataStream<InputData> inputStream = streamFromKafkaSource(env);
+//        sinkToOpensearch(inputStream.map(InputData::toHashMap), commonConfigOpensearch.VALUES_INDEX_NAME);
 
         RandomCutForestOperator<InputData, OutputData> randomCutForestOperator =
                 RandomCutForestOperator.<InputData, OutputData>builder()
@@ -59,13 +63,14 @@ public class StreamingADJob {
 
         DataStream<OutputData> outScoreStream = inputStream.process(randomCutForestOperator, TypeInformation.of(OutputData.class)).setParallelism(1);
         outScoreStream.map(OutputData::toHashMap).print();
-        sinkToOpensearch(outScoreStream.map(OutputData::toHashMap), commonConfigOpensearch.ANOMALIES_INDEX_NAME);
+//        sinkToOpensearch(outScoreStream.map(OutputData::toHashMap), commonConfigOpensearch.ANOMALIES_INDEX_NAME);
 
 
+        outScoreStream.sinkTo(getKafkaSink());
         env.execute();
     }
 
-    private static DataStream<InputData> createSource(
+    private static DataStream<InputData> streamFromKafkaSource(
             final StreamExecutionEnvironment env) {
 
         KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
@@ -81,6 +86,20 @@ public class StreamingADJob {
                 .map(InputData::new);
 
     }
+
+    private static KafkaSink<OutputData> getKafkaSink() {
+        JsonSerializationSchema<OutputData> jsonFormat = new JsonSerializationSchema<>();
+        return KafkaSink.<OutputData>builder()
+                .setBootstrapServers(commonConfigKafka.BROKER)
+                .setRecordSerializer(KafkaRecordSerializationSchema.builder()
+                        .setTopic(commonConfigKafka.TOPIC_OUTPUT_DATA)
+                        .setValueSerializationSchema(jsonFormat)
+                        .build()
+                )
+                .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                .build();
+    }
+
 
     private static void sinkToOpensearch(DataStream<HashMap<String, ?>> hashMapStream, String indexName) {
         hashMapStream.sinkTo(

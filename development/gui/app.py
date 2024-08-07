@@ -5,6 +5,7 @@ import pickle
 from typing import Dict
 
 import altair as alt
+import httpx
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
@@ -13,13 +14,10 @@ from redislite import Redis
 
 logger = logging.getLogger(__name__)
 
-st.title("Real Time Anomaly Detection on Streaming Data")
 
-
+@st.cache_resource
 def get_redis_connection() -> Redis:
-    if "redis_connection" not in st.session_state:
-        st.session_state.redis_connection = Redis('/tmp/redis.db')
-    return st.session_state.redis_connection
+    return Redis('/tmp/redis.db')
 
 
 def get_streaming_data_df(name: str) -> pd.DataFrame:
@@ -36,12 +34,11 @@ def set_streaming_data_df(name: str, df: pd.DataFrame):
     redis_connection.set(name, pickle.dumps(df))
 
 
-def get_cached_consumer(input_topic_name: str) -> KafkaConsumer:
-    key = f"consumer_{input_topic_name}"
-    if key not in st.session_state:
-        st.session_state[key] = get_consumer()
-        st.session_state[key].subscribe([input_topic_name])
-
+@st.cache_resource
+def get_cached_consumer(topic_name: str) -> KafkaConsumer:
+    key = f"consumer_{topic_name}"
+    st.session_state[key] = get_consumer()
+    st.session_state[key].subscribe([topic_name])
     return st.session_state[key]
 
 
@@ -55,7 +52,7 @@ def fetch_new_data_from_kafka(topic: str) -> pd.DataFrame:
     return poll_res_to_df(poll_res)
 
 
-def poll_res_to_df(poll_res: Dict) -> pd.DataFrame:
+def poll_res_to_df(poll_res: Dict, time_col: str = "timestamp") -> pd.DataFrame:
     if poll_res is None or len(poll_res.keys()) == 0:
         return pd.DataFrame()
     if len(poll_res.keys()) != 1:
@@ -64,8 +61,8 @@ def poll_res_to_df(poll_res: Dict) -> pd.DataFrame:
     msgs = poll_res[topic_partition]
     records = [json.loads(msg.value) for msg in msgs]
     new_data = pd.DataFrame.from_records(records)
-    new_data['timestamp'] = pd.to_datetime(new_data['timestamp'], unit='ms')
-    new_data = new_data.set_index('timestamp')
+    new_data[time_col] = pd.to_datetime(new_data[time_col], unit='ms')
+    new_data = new_data.set_index(time_col)
     return new_data
 
 
@@ -89,24 +86,47 @@ def fetch_historical_data_from_kafka(topic: str, len_hist: int,
     return df
 
 
-async def input_data_chart():
-    st.session_state.fragment_runs += 1
-    input_topic_name = "streamingad_simulated_data"
-    st.write(f"New data received from {input_topic_name} (refreshed "
-             f"{st.session_state.fragment_runs} times)")
+async def streaming_charts():
+    # await input_data_chart()
+    st.session_state["min_to_show"] = st.slider(f"Minutes to show", 1, 60, 10)
+    await kafka_streaming_chart("streamingad_simulated_data", "value", "Input data",
+                                st.session_state["min_to_show"])
+    await kafka_streaming_chart("streamingad_output", "score_ad", "Anomaly score",
+                                st.session_state["min_to_show"])
 
-    new_data = fetch_new_data_from_kafka(input_topic_name)
+
+async def input_data_chart():
+    topic_name = "streamingad_simulated_data"
+    new_data = fetch_new_data_from_kafka(topic_name)
     st.dataframe(new_data)
-    in_data = get_streaming_data_df(input_topic_name)
+    in_data = get_streaming_data_df(topic_name)
     in_data = pd.concat([in_data, new_data])
-    set_streaming_data_df(input_topic_name, in_data)
+    set_streaming_data_df(topic_name, in_data)
     st.session_state.minutes_to_show = st.slider("Minutes to show", 1, 60, 10)
     plot_data = in_data.last(f"{st.session_state.minutes_to_show}min").reset_index()
-    plot_timeseries_plotly(plot_data)
+    plot_timeseries_plotly(plot_data, "value", "Input data")
 
 
-def plot_timeseries_plotly(df_to_plot: pd.DataFrame):
-    fig = go.Figure([go.Scatter(x=df_to_plot['timestamp'], y=df_to_plot['value'])])
+async def kafka_streaming_chart(topic_name: str, y_col: str, title: str, last_n_min: int):
+    new_data = fetch_new_data_from_kafka(topic_name)
+    chart_key = f"show_data_{topic_name}_{title}"
+
+    in_data = get_streaming_data_df(topic_name)
+    in_data = pd.concat([in_data, new_data])
+    set_streaming_data_df(topic_name, in_data)
+
+    plot_data = in_data.last(f"{last_n_min} min").reset_index()
+    plot_timeseries_plotly(plot_data, y_col, title)
+    st.toggle("Show Streaming Data as table", key=chart_key)
+
+    if st.session_state[chart_key]:
+        st.dataframe(new_data)
+
+
+def plot_timeseries_plotly(df_to_plot: pd.DataFrame, y_col: str, title: str,
+                           x_col: str = "timestamp", ):
+    fig = go.Figure([go.Scatter(x=df_to_plot[x_col], y=df_to_plot[y_col])])
+    fig.update_layout(title=title)
     st.plotly_chart(fig, use_container_width=True)
 
 
@@ -114,6 +134,55 @@ def plot_timeseries_altair(df_to_plot: pd.DataFrame):
     chart = alt.Chart(df_to_plot).mark_line().encode(x='timestamp:T', y='value', )
     st.altair_chart(chart, theme=None, use_container_width=True)
 
+
+@st.fragment(run_every=0.2)
+def refreshing_fragment():
+    asyncio.run(streaming_charts())
+
+
+def clear_all_cache():
+    st.session_state.clear()
+    conn = get_redis_connection()
+    conn.flushdb()
+
+
+def set_cache_to_history(len_hist: int):
+    topic_name = "streamingad_simulated_data"
+    historical_data = fetch_historical_data_from_kafka(topic_name, len_hist)
+    st.write("Setting cache to historical data")
+    set_streaming_data_df(f"{topic_name}", historical_data)
+
+
+def simulator_settings():
+    st.session_state.simulator_msgs_per_sec = st.slider("Number of messages per second",
+                                                        1, 100, 10)
+    st.session_state.simulator_mean = st.slider("Mean", 0, 10, 1)
+    st.session_state.simulator_variance = st.slider("Variance", 0, 10, 1)
+
+
+def update_gaussian_sampler_simulator_settings():
+    base_url = get_base_simulator_url()
+    update_url = f"{base_url}/gaussian/gaussian_sampler/update"
+    interval_sec = 1 / st.session_state.simulator_msgs_per_sec
+    response = httpx.post(update_url, json={"mean": st.session_state.simulator_mean,
+                                            "variance": 
+                                                st.session_state.simulator_variance,
+                                            "interval_sec": interval_sec})
+
+
+def stop_gaussian_sampler():
+    base_url = get_base_simulator_url()
+    stop_url = f"{base_url}/gaussian/gaussian_sampler/stop"
+    response = httpx.post(stop_url)
+    return response
+
+
+@st.cache_data
+def get_base_simulator_url():
+    return f"http://{st.secrets['SIMULATOR_HOST']}:{st.secrets['SIMULATOR_PORT']}/v1"
+
+
+st.title("Real Time Anomaly Detection on Streaming Data")
 
 st.markdown(
     "First, data is simulated and streamed into a Kafka topic located. Next, the data "
@@ -124,29 +193,6 @@ st.markdown(
     "repository](https://github.com/domenicodigangi/streaming-data-playground/tree/main"
     "/development/flink/streamingad).")
 
-if "app_runs" not in st.session_state:
-    st.session_state.app_runs = 0
-    st.session_state.fragment_runs = 0
-
-
-@st.fragment(run_every=0.2)
-def refreshing_fragment():
-    asyncio.run(input_data_chart())
-
-
-def clear_all_cache():
-    st.session_state.clear()
-    conn = get_redis_connection()
-    conn.flushdb()
-
-
-def set_cache_to_history(len_hist: int):
-    input_topic_name = "streamingad_simulated_data"
-    historical_data = fetch_historical_data_from_kafka(input_topic_name, len_hist)
-    st.write("Setting cache to historical data")
-    set_streaming_data_df(f"{input_topic_name}", historical_data)
-
-
 with st.sidebar:
     st.button("Reset", on_click=clear_all_cache)
     len_hist = st.slider(label="N messages from history", min_value=1_000,
@@ -154,8 +200,23 @@ with st.sidebar:
     if st.button("Set cache to history"):
         set_cache_to_history(len_hist)
 
-live = st.toggle("Live data", True)
+    st.header("Simulator settings")
+    simulator_settings()
+    col_1, col_2 = st.columns(2)
+    with col_1:
+        if st.button("Start/Update simulator"):
+            update_gaussian_sampler_simulator_settings()
+    with col_2:
+        if st.button("Stop simulator"):
+            stop_gaussian_sampler()
+
+col_1, col_2 = st.columns(2)
+with col_1:
+    live = st.toggle("Live data", True)
+with col_2:
+    st.button("Refresh")
+
 if live:
     refreshing_fragment()
 else:
-    asyncio.run(input_data_chart())
+    asyncio.run(streaming_charts())
