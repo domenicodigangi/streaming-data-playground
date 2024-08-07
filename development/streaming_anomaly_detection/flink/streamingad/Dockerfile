@@ -1,23 +1,14 @@
-# Stage 1: Build the Flink job using Maven
-FROM   flink:1.18.1
-# Set the working directory inside the container
-WORKDIR /app
+FROM maven:3.6.3-jdk-11 AS build
 
-# Copy the Maven project files to the container
+WORKDIR /app
 COPY pom.xml ./
 COPY src ./src
-
-# Compile the Maven project and package it as a JAR file
 RUN mvn clean package
+RUN ls -l /app/target
 
-# Stage 2: Run the Flink job in local mode
-FROM flink:1.18-scala_2.12
+FROM flink:1.18
 
-# Set the working directory inside the container
 WORKDIR /opt/flink
-
-# Copy the JAR file from the build stage to the Flink container
-COPY --from=build /app/target/your-flink-job.jar /opt/flink/job.jar
-
-# Set the entry point to run the Flink job in local mode
-ENTRYPOINT ["flink", "run", "-c", "com.your.package.MainClass", "job.jar"]
+COPY --from=build /app/target/streamingad-0.1-SNAPSHOT.jar /opt/flink/job.jar
+COPY /src/main/resources/ /opt/flink/src/main/resources/
+ENTRYPOINT ["flink", "run", "-c", "org.streamingad.StreamingADJob", "job.jar"]

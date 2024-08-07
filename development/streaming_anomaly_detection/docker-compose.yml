@@ -39,6 +39,18 @@ services:
     build: ./gui/streamlit_streaming_ad
     ports:
       - "8501:8501"
+    networks:
+      - playgroud-network
+  flink-streaming-ad:
+    build: ./flink/streamingad
+    networks:
+      - playgroud-network
+  data-simulator:
+    build: ./data-simulator
+    ports:
+      - "8001:8001"
+    networks:
+      - playgroud-network
   #
   #  ksqldb-server:
   #    image: confluentinc/cp-ksqldb-server:7.4.0
@@ -134,16 +146,16 @@ services:
   #    networks:
   #      - playgroud-network
 
-  grafana:
-    image: grafana/grafana-enterprise
-    container_name: grafana
-    restart: unless-stopped
-    ports:
-      - '3000:3000'
-    volumes:
-      - grafana-storage:/var/lib/grafana
-    networks:
-      - playgroud-network
+#  grafana:
+#    image: grafana/grafana-enterprise
+#    container_name: grafana
+#    restart: unless-stopped
+#    ports:
+#      - '3000:3000'
+#    volumes:
+#      - grafana-storage:/var/lib/grafana
+#    networks:
+#      - playgroud-network
 
 
 volumes:
