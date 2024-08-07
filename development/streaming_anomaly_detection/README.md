@@ -12,6 +12,8 @@ and visualized using Plotly. The app interacts with a Kafka stream to display bo
 3. **Streamlit Interface**: Displays real-time data and anomaly scores, allowing user interaction. Using Redis under the
    hood to cache data between streamlit refreshes.
 
+![image info](./images/streaming anomaly detection diagram.jpg)
+
 ### How It Works:
 
 - **Data Streaming**: Simulated data is published to Kafka topics.
@@ -33,16 +35,6 @@ and visualized using Plotly. The app interacts with a Kafka stream to display bo
 3. **View History**: Set the cache to display historical data by adjusting the slider for the number of historical
    messages.
 4. **Streaming Data Table**: Optionally display the raw streaming data in table format.
-
-## Example Plots
-
-### Input Data Stream
-
-![Input Data Stream](input_data_stream.png)
-
-### Anomaly Score
-
-![Anomaly Score](anomaly_score.png)
 
 For more details and to run this project, visit
 the [GitHub repository](https://github.com/domenicodigangi/streaming-data-playground/tree/main/development/flink/streamingad).
