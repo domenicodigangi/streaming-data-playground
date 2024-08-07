@@ -34,6 +34,11 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     networks:
       - playgroud-network
+  
+  streamlit:
+    build: ./gui/streamlit_streaming_ad
+    ports:
+      - "8501:8501"
   #
   #  ksqldb-server:
   #    image: confluentinc/cp-ksqldb-server:7.4.0
