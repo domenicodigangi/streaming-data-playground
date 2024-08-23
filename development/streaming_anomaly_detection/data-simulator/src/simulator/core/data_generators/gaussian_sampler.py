@@ -1,4 +1,3 @@
-import json
 import logging
 import random
 from datetime import datetime
@@ -13,13 +12,14 @@ logger = logging.getLogger(__name__)
 
 
 class GaussianSamplerParams(AbstractSamplerParams):
-    sampler_id: int|None
+    sampler_id: int | None
     mean: float = 0.1
     variance: float = 1.0
 
     @cached_property
     def source_id(self) -> str:
         return f"gaussian_sampler_{self.sampler_id}"
+
 
 class GaussianSampler(AbstractSampler):
     def __init__(self, params: GaussianSamplerParams | None = None):
@@ -30,7 +30,6 @@ class GaussianSampler(AbstractSampler):
         sampled_value = random.gauss(self.params.mean, self.params.variance ** 0.5)
         logger.debug("Sampled value: %s", sampled_value)
         timestamp = int(datetime.now().timestamp() * 1000)
-        msg = {"source_id": self.params.source_id
-            , "value": sampled_value,
+        msg = {"source_id": self.params.source_id, "value": sampled_value,
                "timestamp": timestamp, }
         return msg
