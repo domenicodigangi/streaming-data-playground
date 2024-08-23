@@ -1,6 +1,8 @@
+import json
 import logging
 import subprocess
 from functools import cached_property
+from typing import Dict
 
 import tenacity
 from kafka import KafkaProducer
@@ -45,9 +47,14 @@ class KafkaPublisher(AbstractPeriodicMsgPublisher):
         logger.info("Kafka config: %s", self._config)
         self.producer = self.get_producer()
 
-    def publish_one(self, msg: bytes):
-        logger.info("Publishing message: %s", msg)
-        self.producer.send(self._config.topic, value=msg)
+    def publish_one(self, msg: Dict, source_id_as_key:bool=True):
+        if source_id_as_key:
+            key = msg["source_id"].encode("utf-8")
+        else:
+            key = None
+        msg_str = json.dumps(msg).encode("utf-8")
+        logger.info("Publishing message: %s, with key %s", msg_str, key )
+        self.producer.send(self._config.topic, value=msg_str, key=key)
         self.producer.flush()
 
 

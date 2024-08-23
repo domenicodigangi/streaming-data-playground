@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from abc import ABC
+from typing import Dict
 
 from simulator.core.data_generators.abstract_sampler import AbstractSampler
 
@@ -16,10 +17,10 @@ class AbstractPeriodicMsgPublisher(ABC):
             self.publish_one(msg)
             await asyncio.sleep(sampler.params.interval_sec)
 
-    def get_msg_from_sampler(self, sampler: AbstractSampler) -> bytes:
-        msg_str = sampler.sample_one_msg()
-        logger.debug("Sampled message: %s", msg_str)
-        return msg_str.encode("utf-8")
+    def get_msg_from_sampler(self, sampler: AbstractSampler) -> Dict:
+        msg = sampler.sample_one_msg()
+        logger.debug("Sampled message: %s", msg)
+        return msg
 
-    def publish_one(self, msg: bytes):
+    def publish_one(self, msg: Dict):
         raise NotImplementedError()

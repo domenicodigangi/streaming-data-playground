@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import Dict
 
 from pydantic import BaseModel
 
@@ -12,5 +13,5 @@ class AbstractSampler(ABC):
     def __init__(self, params: AbstractSamplerParams | None = None):
         self.params = params or AbstractSamplerParams()
 
-    def sample_one_msg(self) -> str:
+    def sample_one_msg(self) -> Dict:
         raise NotImplementedError()
