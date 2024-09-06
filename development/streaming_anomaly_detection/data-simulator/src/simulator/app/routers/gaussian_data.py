@@ -3,6 +3,7 @@ import logging
 from fastapi import APIRouter
 
 from simulator.app.background_tasks_helper import BackgroundTasksHelper, TaskSetup
+from simulator.core.data_generators.anomalies import AnomalyDefinition, AnomalyHelper
 from simulator.core.data_generators.gaussian_sampler import (GaussianDataSourceSettings,
                                                              GaussianSampler,
                                                              GaussianSamplerParams, )
@@ -25,7 +26,8 @@ async def start(item_id: str, params: GaussianSamplerParams | None = None):
     source_settings = GaussianDataSourceSettings(sampler_id=item_id, params=params)
     gaussian_sample_task = TaskSetup(task_name=get_task_name(item_id),
                                      executor=KafkaPublisher().publish_loop(
-                                         GaussianSampler(source_settings)), )
+                                         GaussianSampler(source_settings)),
+                                     executor_settings=source_settings)
     return await BackgroundTasksHelper.start_task(gaussian_sample_task, )
 
 
@@ -34,17 +36,22 @@ async def update(item_id: str, params: GaussianSamplerParams | None = None):
     source_settings = GaussianDataSourceSettings(sampler_id=item_id, params=params)
     gaussian_sample_task = TaskSetup(task_name=get_task_name(item_id),
                                      executor=KafkaPublisher().publish_loop(
-                                         GaussianSampler(source_settings)), )
+                                         GaussianSampler(source_settings)),
+                                     executor_settings=source_settings)
     return await BackgroundTasksHelper.update_task(gaussian_sample_task, )
 
 
-# @gaussian_router.post(f"/{TASK_NAME}/" + "{item_id}/anomaly")
-# async def anomaly(item_id: str, params: GaussianSamplerParams | None = None):
-#     source_settings = GaussianDataSourceSettings(sampler_id=item_id, params=params)
-#     gaussian_sample_task = TaskSetup(task_name=get_task_name(item_id),
-#                                      executor=KafkaPublisher().publish_loop(
-#                                          GaussianSampler(source_settings)), )
-#     return await BackgroundTasksHelper.update_task(gaussian_sample_task, )
+@gaussian_router.post(f"/{TASK_NAME}/" + "{item_id}/anomaly")
+async def anomaly(item_id: str, anomaly: AnomalyDefinition):
+    helper = AnomalyHelper(anomaly)
+    task_setup = await BackgroundTasksHelper.get_task_setup(get_task_name(item_id))
+    new_source_settings = task_setup.executor_settings.model_copy(
+        update={"initial_additive_delta_list": helper.generate_list_to_add()})
+    gaussian_sample_task = TaskSetup(task_name=get_task_name(item_id),
+                                     executor=KafkaPublisher().publish_loop(
+                                         GaussianSampler(new_source_settings)),
+                                     executor_settings=new_source_settings)
+    return await BackgroundTasksHelper.update_task(gaussian_sample_task, )
 
 
 @gaussian_router.post(f"/{TASK_NAME}/" + "{item_id}/stop")
