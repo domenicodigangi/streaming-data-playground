@@ -8,6 +8,6 @@ RUN pip install poetry
 
 RUN poetry install 
 
-EXPOSE 8000
+EXPOSE 8001
 
 CMD ["poetry", "run", "simulator"]

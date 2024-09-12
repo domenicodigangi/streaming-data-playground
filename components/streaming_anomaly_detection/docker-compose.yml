@@ -34,30 +34,32 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     networks:
       - playgroud-network
-  postgres:
-    image: postgres:14-alpine
-    ports:
-      - 5432:5432
-    volumes:
-      - postgres-data-streaming-ad:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=test_password
-      - POSTGRES_USER=test_user
-      - POSTGRES_DB=test_db
-  streamlit:
-    build: ./gui/streamlit_streaming_ad
-    ports:
-      - "8501:8501"
-    networks:
-      - playgroud-network
-  flink-streaming-ad:
-    build: ./flink/streamingad
-    networks:
-      - playgroud-network
+  #  postgres:
+  #    image: postgres:14-alpine
+  #    ports:
+  #      - 5432:5432
+  #    volumes:
+  #      - postgres-data-streaming-ad:/var/lib/postgresql/data
+  #    environment:
+  #      - POSTGRES_PASSWORD=test_password
+  #      - POSTGRES_USER=test_user
+  #      - POSTGRES_DB=test_db
+  #  streamlit:
+  #    build: ./gui/streamlit_streaming_ad
+  #    ports:
+  #      - "8501:8501"
+  #    networks:
+  #      - playgroud-network
+  #  flink-streaming-ad:
+  #    build: ./flink/streamingad
+  #    networks:
+  #      - playgroud-network
   data-simulator:
     build: ./data-simulator
     ports:
       - "8001:8001"
+    volumes:
+      - ./data-simulator/conf:/app/conf
     networks:
       - playgroud-network
   #
