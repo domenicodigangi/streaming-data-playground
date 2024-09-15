@@ -46,7 +46,7 @@ services:
       - ./data-simulator/conf/config_for_compose.yaml:/app/conf/config.yaml
     networks:
       - playgroud-network
-  
+
   gui-streamlit:
     build: ./gui/streamlit_streaming_ad
     ports:
@@ -55,31 +55,43 @@ services:
       - ./gui/streamlit_streaming_ad/.streamlit/secrets_for_compose.toml/:/app/.streamlit/secrets.toml
     networks:
       - playgroud-network
-    #  postgres:
-    #    image: postgres:14-alpine
-    #    ports:
-    #      - 5432:5432
-    #    volumes:
-    #      - postgres-data-streaming-ad:/var/lib/postgresql/data
-    #    environment:
-    #      - POSTGRES_PASSWORD=test_password
-    #      - POSTGRES_USER=test_user
-    #      - POSTGRES_DB=test_db
+      #  postgres:
+      #    image: postgres:14-alpine
+      #    ports:
+      #      - 5432:5432
+      #    volumes:
+      #      - postgres-data-streaming-ad:/var/lib/postgresql/data
+      #    environment:
+      #      - POSTGRES_PASSWORD=test_password
+      #      - POSTGRES_USER=test_user
+      #      - POSTGRES_DB=test_db
   
-  #  flink-streaming-ad:
-  #    build: ./flink/streamingad
-  #    networks:
-  #      - playgroud-network
-  #  flink:
-  #    image: flink:1.18
-  #    container_name: flink_job
-  #    ports:
-  #      - 8081:8081
-  #    volumes:
-  #      - ./target/streamingad-flink-0.1-SNAPSHOT.jar:/opt/flink/usrlib/job.jar
-  #    #    entrypoint: flink run -c org.streamingad.EntityStatusJob /opt/flink/usrlib/job.jar
-  #    entrypoint: [ "bash", "-c", "tail -f /dev/null" ]
+  
+  jobmanager:
+    image: flink:1.18.1-scala_2.12
+    ports:
+      - "8081:8081"
+    command: standalone-job --job-classname org.streamingad.StreamingADJob  --jars /opt/flink/usrlib/job.jar
+    volumes:
+      - ./flink/streamingad/target/streamingad-0.1-SNAPSHOT.jar:/opt/flink/usrlib/job.jar
+      - ./flink/streamingad/src/main/resources/kafka-config-for-compose.properties:/opt/flink/src/main/resources/kafka-config.properties
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        parallelism.default: 2        
 
+  taskmanager:
+    image: flink:1.18.1-scala_2.12
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        parallelism.default: 2    
 
 volumes:
   postgres-data-streaming-ad: { }
