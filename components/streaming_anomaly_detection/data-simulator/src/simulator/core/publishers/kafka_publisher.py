@@ -8,11 +8,10 @@ import tenacity
 from kafka import KafkaProducer
 from pydantic import BaseModel
 
-from simulator.core import load_config_yaml
+from simulator.core import load_config_yaml, setup_logger
 from simulator.core.publishers.abstract_publisher import AbstractPeriodicMsgPublisher
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = setup_logger(__name__, level=logging.INFO)
 
 
 def get_kafka_port_from_kubectl() -> str:
@@ -44,42 +43,57 @@ class KafkaProducerPool:
         self.pool_size = pool_size
         self.producers = self._create_producer_pool()
 
+    @tenacity.retry(wait=tenacity.wait_exponential(multiplier=1, min=4, max=10))
     def _create_producer_pool(self) -> List[KafkaProducer]:
         return [KafkaProducer(bootstrap_servers=self.bootstrap_servers,
                               value_serializer=lambda v: v) for _ in
                 range(self.pool_size)]
 
     def get_producer(self) -> KafkaProducer:
-        # Simple round-robin mechanism
         producer = self.producers.pop(0)
-        self.producers.append(producer)
         return producer
+
+    def put_producer(self, producer: KafkaProducer):
+        self.producers.append(producer)
 
 
 class KafkaPublisher(AbstractPeriodicMsgPublisher):
-    _producer_pool = None
+    __producer_pool = None
+    __config: KafkaConfig | None = None
 
     def __init__(self):
         super().__init__()
-        self._config = KafkaConfig(**load_config_yaml("kafka-config.yaml"))
+        self.__init_class_conn_pool()
 
-        logger.info("Kafka config: %s", self._config)
-        if KafkaPublisher._producer_pool is None:
-            KafkaPublisher._producer_pool = KafkaProducerPool(
-                bootstrap_servers=self._config.bootstrap_servers)
+    @classmethod
+    def __init_class_conn_pool(cls):
+        if cls.__producer_pool is None:
+            cls.__set_kafka_config()
+            cls.__producer_pool = KafkaProducerPool(
+                bootstrap_servers=cls.__config.bootstrap_servers)
 
-        self.producer = self.get_producer()
+    @classmethod
+    def __set_kafka_config(cls):
+        if cls.__config is None:
+            config_dict = load_config_yaml("config.yaml")
+            cls.__config = KafkaConfig(**config_dict)
+            logger.info("Kafka config: %s", cls.__config)
 
     def publish_one(self, msg: Dict, source_id_as_key: bool = True):
-        if source_id_as_key:
-            key = msg["source_id"].encode("utf-8")
-        else:
-            key = None
-        msg_str = json.dumps(msg).encode("utf-8")
-        logger.info("Publishing message: %s, with key %s", msg_str, key)
-        self.producer.send(self._config.topic, value=msg_str, key=key)
-        self.producer.flush()
+        msg_str = self._format_msg(msg)
+        key = self._get_key(msg, source_id_as_key)
+        self._produce_msg_using_pool(msg_str, key)
 
-    @tenacity.retry(wait=tenacity.wait_exponential(multiplier=1, min=4, max=10))
-    def get_producer(self):
-        return KafkaPublisher._producer_pool.get_producer()
+    def _format_msg(self, msg: Dict) -> bytes:
+        return json.dumps(msg).encode("utf-8")
+
+    def _get_key(self, msg: Dict, source_id_as_key: bool) -> bytes:
+        if source_id_as_key:
+            return msg["source_id"].encode("utf-8")
+
+    def _produce_msg_using_pool(self, msg_str: bytes, key: bytes):
+        logger.info("Publishing message: %s, with key %s", msg_str, key)
+        producer = self.__producer_pool.get_producer()
+        producer.send(self.__config.topic, value=msg_str, key=key)
+        producer.flush()
+        self.__producer_pool.put_producer(producer)

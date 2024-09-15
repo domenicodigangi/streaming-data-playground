@@ -26,7 +26,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_HOST://broker:29092
       KAFKA_CREATE_TOPICS: "streamingad_simulated_data:1:1,streamingad_output:1:1"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
@@ -34,58 +34,42 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     networks:
       - playgroud-network
-  #  postgres:
-  #    image: postgres:14-alpine
-  #    ports:
-  #      - 5432:5432
-  #    volumes:
-  #      - postgres-data-streaming-ad:/var/lib/postgresql/data
-  #    environment:
-  #      - POSTGRES_PASSWORD=test_password
-  #      - POSTGRES_USER=test_user
-  #      - POSTGRES_DB=test_db
-  #  streamlit:
-  #    build: ./gui/streamlit_streaming_ad
-  #    ports:
-  #      - "8501:8501"
-  #    networks:
-  #      - playgroud-network
+
+  data-simulator:
+    build:
+      context: ./data-simulator
+      args:
+        - no-cache
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data-simulator/conf/config_for_compose.yaml:/app/conf/config.yaml
+    networks:
+      - playgroud-network
+  
+  gui-streamlit:
+    build: ./gui/streamlit_streaming_ad
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./gui/streamlit_streaming_ad/.streamlit/secrets_for_compose.toml/:/app/.streamlit/secrets.toml
+    networks:
+      - playgroud-network
+    #  postgres:
+    #    image: postgres:14-alpine
+    #    ports:
+    #      - 5432:5432
+    #    volumes:
+    #      - postgres-data-streaming-ad:/var/lib/postgresql/data
+    #    environment:
+    #      - POSTGRES_PASSWORD=test_password
+    #      - POSTGRES_USER=test_user
+    #      - POSTGRES_DB=test_db
+  
   #  flink-streaming-ad:
   #    build: ./flink/streamingad
   #    networks:
   #      - playgroud-network
-  data-simulator:
-    build: ./data-simulator
-    ports:
-      - "8001:8001"
-    volumes:
-      - ./data-simulator/conf:/app/conf
-    networks:
-      - playgroud-network
-  #
-  #  ksqldb-server:
-  #    image: confluentinc/cp-ksqldb-server:7.4.0
-  #    hostname: ksqldb-server
-  #    container_name: ksqldb-server
-  #    depends_on:
-  #      - broker
-  #    ports:
-  #      - "8088:8088"
-  #    environment:
-  #      KSQL_LISTENERS: http://0.0.0.0:8088
-  #      KSQL_BOOTSTRAP_SERVERS: broker:9092
-  #      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
-  #      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
-  #
-  #  ksqldb-cli:
-  #    image: confluentinc/cp-ksqldb-cli:7.4.0
-  #    container_name: ksqldb-cli
-  #    depends_on:
-  #      - broker
-  #      - ksqldb-server
-  #    entrypoint: /bin/sh
-  #    tty: true
-
   #  flink:
   #    image: flink:1.18
   #    container_name: flink_job
@@ -95,84 +79,9 @@ services:
   #      - ./target/streamingad-flink-0.1-SNAPSHOT.jar:/opt/flink/usrlib/job.jar
   #    #    entrypoint: flink run -c org.streamingad.EntityStatusJob /opt/flink/usrlib/job.jar
   #    entrypoint: [ "bash", "-c", "tail -f /dev/null" ]
-  #  opensearch-node1:
-  #    image: opensearchproject/opensearch:latest
-  #    container_name: opensearch-node1
-  #    environment:
-  #      - cluster.name=opensearch-cluster # Name the cluster
-  #      - node.name=opensearch-node1 # Name the node that will run in this container
-  #      - discovery.seed_hosts=opensearch-node1,opensearch-node2 # Nodes to look for when discovering the cluster
-  #      - cluster.initial_master_nodes=opensearch-node1,opensearch-node2 # Nodes eligible to serve as master
-  #      - bootstrap.memory_lock=true # Disable JVM heap memory swapping
-  #      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # Set min and max JVM heap sizes to at least 50% of system RAM
-  #      - "DISABLE_INSTALL_DEMO_CONFIG=true" # Prevents execution of bundled demo script which installs demo certificates and security configurations to OpenSearch
-  #      - "DISABLE_SECURITY_PLUGIN=true" # Disables security plugin
-  #    ulimits:
-  #      memlock:
-  #        soft: -1 # Set memlock to unlimited (no soft or hard limit)
-  #        hard: -1
-  #      nofile:
-  #        soft: 65536 # Maximum number of open files for the opensearch user - set to at least 65536
-  #        hard: 65536
-  #    volumes:
-  #      - opensearch-data1:/usr/share/opensearch/data # Creates volume called opensearch-data1 and mounts it to the container
-  #    ports:
-  #      - 9200:9200 # REST API
-  #      - 9600:9600 # Performance Analyzer
-  #    networks:
-  #      - playgroud-network # All of the containers will join the same Docker bridge network
-  #  opensearch-node2:
-  #    image: opensearchproject/opensearch:latest
-  #    container_name: opensearch-node2
-  #    environment:
-  #      - cluster.name=opensearch-cluster # Name the cluster
-  #      - node.name=opensearch-node2 # Name the node that will run in this container
-  #      - discovery.seed_hosts=opensearch-node1,opensearch-node2 # Nodes to look for when discovering the cluster
-  #      - cluster.initial_master_nodes=opensearch-node1,opensearch-node2 # Nodes eligible to serve as master
-  #      - bootstrap.memory_lock=true # Disable JVM heap memory swapping
-  #      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # Set min and max JVM heap sizes to at least 50% of system RAM
-  #      - "DISABLE_INSTALL_DEMO_CONFIG=true" # Prevents execution of bundled demo script which installs demo certificates and security configurations to OpenSearch
-  #      - "DISABLE_SECURITY_PLUGIN=true" # Disables security plugin
-  #    ulimits:
-  #      memlock:
-  #        soft: -1 # Set memlock to unlimited (no soft or hard limit)
-  #        hard: -1
-  #      nofile:
-  #        soft: 65536 # Maximum number of open files for the opensearch user - set to at least 65536
-  #        hard: 65536
-  #    volumes:
-  #      - opensearch-data2:/usr/share/opensearch/data # Creates volume called opensearch-data2 and mounts it to the container
-  #    networks:
-  #      - playgroud-network # All of the containers will join the same Docker bridge network
-  #  opensearch-dashboards:
-  #    image: opensearchproject/opensearch-dashboards:latest
-  #    container_name: opensearch-dashboards
-  #    ports:
-  #      - 5601:5601 # Map host port 5601 to container port 5601
-  #    expose:
-  #      - "5601" # Expose port 5601 for web access to OpenSearch Dashboards
-  #    environment:
-  #      - 'OPENSEARCH_HOSTS=["http://opensearch-node1:9200","http://opensearch-node2:9200"]'
-  #      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true" # disables security dashboards plugin in OpenSearch Dashboards
-  #    networks:
-  #      - playgroud-network
-
-#  grafana:
-#    image: grafana/grafana-enterprise
-#    container_name: grafana
-#    restart: unless-stopped
-#    ports:
-#      - '3000:3000'
-#    volumes:
-#      - grafana-storage:/var/lib/grafana
-#    networks:
-#      - playgroud-network
 
 
 volumes:
-  opensearch-data1:
-  opensearch-data2:
-  grafana-storage: { }
   postgres-data-streaming-ad: { }
 
 networks:

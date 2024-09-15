@@ -44,7 +44,9 @@ def get_cached_consumer(topic_name: str) -> KafkaConsumer:
 
 
 def get_consumer(**kwargs) -> KafkaConsumer:
-    return KafkaConsumer(bootstrap_servers=st.secrets["BOOTSTRAP_URL"], **kwargs)
+    bootstrap_servers = st.secrets["BOOTSTRAP_URL"]
+    logger.info(f"Creating Kafka consumer with bootstrap servers: {bootstrap_servers}")
+    return KafkaConsumer(bootstrap_servers=bootstrap_servers, **kwargs)
 
 
 def fetch_new_data_from_kafka(topic: str) -> pd.DataFrame:
