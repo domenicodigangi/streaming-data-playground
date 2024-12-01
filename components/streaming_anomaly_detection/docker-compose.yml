@@ -64,34 +64,40 @@ services:
       #      - POSTGRES_PASSWORD=test_password
       #      - POSTGRES_USER=test_user
       #      - POSTGRES_DB=test_db
-  
-  jobmanager:
-    image: flink:1.18.1-scala_2.12
-    ports:
-      - "8081:8081"
-    command: standalone-job --job-classname org.streamingad.StreamingADJob  --jars /opt/flink/usrlib/job.jar
-    volumes:
-      - ./flink/streamingad/target/streamingad-0.1-SNAPSHOT.jar:/opt/flink/usrlib/job.jar
-      - ./flink/streamingad/src/main/resources/kafka-config-for-compose.properties:/opt/flink/src/main/resources/kafka-config.properties
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        parallelism.default: 2        
-  
-  
-  taskmanager:
-    image: flink:1.18.1-scala_2.12
-    depends_on:
-      - jobmanager
-    command: taskmanager
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 2
-        parallelism.default: 2    
 
+#  jobmanager:
+#    image: flink:1.18
+#    ports:
+#      - "8081:8081"
+#
+#    command:
+#      - flink run /opt/flink/usrlib/job.jar --job-classname org.streamingad.StreamingADJob
+#    volumes:
+#      - ./flink/streamingad/target/streamingad-0.1-SNAPSHOT.jar:/opt/flink/usrlib/job.jar
+#      - ./flink/streamingad/src/main/resources/kafka-config-for-compose.properties:/opt/flink/src/main/resources/kafka-config.properties
+#    environment:
+#      - |
+#        FLINK_PROPERTIES=
+#        jobmanager.rpc.address: jobmanager
+#        parallelism.default: 2        
+#  
+#  
+#  taskmanager:
+#    image: flink:1.18
+#    depends_on:
+#      - jobmanager
+#    command: taskmanager
+#    volumes:
+#      - ./flink/streamingad/target/streamingad-0.1-SNAPSHOT.jar:/opt/flink/usrlib/job.jar
+#      - ./flink/streamingad/src/main/resources/kafka-config-for-compose.properties:/opt/flink/src/main/resources/kafka-config.properties
+#
+#    environment:
+#      - |
+#        FLINK_PROPERTIES=
+#        jobmanager.rpc.address: jobmanager
+#        taskmanager.numberOfTaskSlots: 2
+#        parallelism.default: 2    
+#
 
 volumes:
   postgres-data-streaming-ad: { }

@@ -1,6 +1,5 @@
 package org.streamingad.entities;
 
-
 import org.apache.flink.api.java.utils.ParameterTool;
 
 import java.io.IOException;
@@ -17,10 +16,10 @@ public class commonConfigKafka {
         }
     }
 
-
-    public static final String BROKER = parameters.get("broker", "localhost");
-    public static final String TOPIC_INPUT_DATA = parameters.get("inputStreamName", "");
-    public static final String TOPIC_OUTPUT_DATA = parameters.get("outputStreamName", "");
+    // Read from environment variables, fallback to properties file or default values
+    public static final String BROKER = System.getenv("KAFKA_BROKER") != null ? System.getenv("KAFKA_BROKER") : parameters.get("broker", "kafka.hland.domotz.dev:31472");
+    public static final String TOPIC_INPUT_DATA = System.getenv("KAFKA_TOPIC_INPUT_DATA") != null ? System.getenv("KAFKA_TOPIC_INPUT_DATA") : parameters.get("inputStreamName", "device-metrics");
+    public static final String TOPIC_OUTPUT_DATA = System.getenv("KAFKA_TOPIC_OUTPUT_DATA") != null ? System.getenv("KAFKA_TOPIC_OUTPUT_DATA") : parameters.get("outputStreamName", "device-anomalies");
 
     public commonConfigKafka() throws IOException {
     }
@@ -32,4 +31,3 @@ public class commonConfigKafka {
         System.out.println("Topic output data: " + TOPIC_OUTPUT_DATA);
     }
 }
-

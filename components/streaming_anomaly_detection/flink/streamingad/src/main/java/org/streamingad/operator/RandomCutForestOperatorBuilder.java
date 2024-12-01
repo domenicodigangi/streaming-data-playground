@@ -23,7 +23,7 @@ import org.apache.flink.util.Preconditions;
 
 import java.util.Optional;
 
-public class RandomCutForestOperatorBuilder<T, R> {
+public class RandomCutForestOperatorBuilder<K, T, R> {
     private static final int DEFAULT_DIMENSIONS = 1;
     private static final int DEFAULT_SHINGLES = 1;
     private static final int DEFAULT_NUMBER_OF_TREES = RandomCutForest.DEFAULT_NUMBER_OF_TREES;
@@ -38,48 +38,49 @@ public class RandomCutForestOperatorBuilder<T, R> {
     private InputDataMapper<T> inputDataMapper;
     private ResultMapper<T, R> resultMapper;
 
-    RandomCutForestOperatorBuilder() {}
+    RandomCutForestOperatorBuilder() {
+    }
 
-    public RandomCutForestOperatorBuilder<T, R> setDimensions(int dimensions) {
+    public RandomCutForestOperatorBuilder<K, T, R> setDimensions(int dimensions) {
         Preconditions.checkArgument(dimensions > 0, "Number of dimensions must be positive.");
         this.dimensions = dimensions;
         return this;
     }
 
-    public RandomCutForestOperatorBuilder<T, R> setShingleSize(Integer shingleSize) {
+    public RandomCutForestOperatorBuilder<K, T, R> setShingleSize(Integer shingleSize) {
         Preconditions.checkArgument(dimensions > 0, "Shingle size must be positive.");
         this.shingleSize = shingleSize;
         return this;
     }
 
-    public RandomCutForestOperatorBuilder<T, R> setReportAnomaliesAfter(Integer reportAnomaliesAfter) {
+    public RandomCutForestOperatorBuilder<K, T, R> setReportAnomaliesAfter(Integer reportAnomaliesAfter) {
         this.reportAnomaliesAfter = reportAnomaliesAfter;
         return this;
     }
 
-    public RandomCutForestOperatorBuilder<T, R> setNumberOfTrees(Integer numberOfTrees) {
+    public RandomCutForestOperatorBuilder<K, T, R> setNumberOfTrees(Integer numberOfTrees) {
         Preconditions.checkArgument(numberOfTrees > 0, "Number of trees must be positive.");
         this.numberOfTrees = numberOfTrees;
         return this;
     }
 
-    public RandomCutForestOperatorBuilder<T, R> setSampleSize(Integer sampleSize) {
+    public RandomCutForestOperatorBuilder<K, T, R> setSampleSize(Integer sampleSize) {
         Preconditions.checkArgument(sampleSize > 0, "Sample size must be positive.");
         this.sampleSize = sampleSize;
         return this;
     }
 
-    public RandomCutForestOperatorBuilder<T, R> setInputDataMapper(InputDataMapper<T> inputDataMapper) {
+    public RandomCutForestOperatorBuilder<K, T, R> setInputDataMapper(InputDataMapper<T> inputDataMapper) {
         this.inputDataMapper = inputDataMapper;
         return this;
     }
 
-    public RandomCutForestOperatorBuilder<T, R> setResultMapper(ResultMapper<T, R> resultMapper) {
+    public RandomCutForestOperatorBuilder<K, T, R> setResultMapper(ResultMapper<T, R> resultMapper) {
         this.resultMapper = resultMapper;
         return this;
     }
 
-    public RandomCutForestOperator<T, R> build() {
+    public RandomCutForestOperator<K, T, R> build() {
         int dimensionsValue = Optional.ofNullable(dimensions).orElse(DEFAULT_DIMENSIONS);
         int shinglesValue = Optional.ofNullable(shingleSize).orElse(DEFAULT_SHINGLES);
         int sampleSizeValue = Optional.ofNullable(sampleSize).orElse(DEFAULT_SAMPLE_SIZE);

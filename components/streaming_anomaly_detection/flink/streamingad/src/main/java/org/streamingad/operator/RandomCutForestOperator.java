@@ -27,14 +27,14 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
-import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.Preconditions;
 
 import java.util.Collections;
 import java.util.Iterator;
 
-public class RandomCutForestOperator<T, R> extends ProcessFunction<T, R> implements CheckpointedFunction {
+public class RandomCutForestOperator<K, T, R> extends KeyedProcessFunction<K, T, R> implements CheckpointedFunction {
     public static final InputDataMapper<Float> SIMPLE_FLOAT_INPUT_DATA_MAPPER = (input) -> new double[]{input};
     public static final ResultMapper<Float, Tuple2<Float, Double>> SIMPLE_TUPLE_RESULT_DATA_MAPPER = Tuple2::of;
 
@@ -75,7 +75,7 @@ public class RandomCutForestOperator<T, R> extends ProcessFunction<T, R> impleme
     }
 
     @Override
-    public void processElement(T value, ProcessFunction<T, R>.Context ctx, Collector<R> out) {
+    public void processElement(T value, Context ctx, Collector<R> out) {
         double[] inputData = inputDataMapper.apply(value);
         Preconditions.checkArgument(inputData.length == dimensions);
 
@@ -113,7 +113,7 @@ public class RandomCutForestOperator<T, R> extends ProcessFunction<T, R> impleme
         }
     }
 
-    public static <T, R> RandomCutForestOperatorBuilder<T, R> builder() {
+    public static <K, T, R> RandomCutForestOperatorBuilder<K, T, R> builder() {
         return new RandomCutForestOperatorBuilder<>();
     }
 }

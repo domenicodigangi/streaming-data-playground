@@ -1,0 +1,51 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  namespace: flink
+  name: streamingad-flink
+spec:
+  image: flink:1.18
+  flinkVersion: v1_18
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    state.savepoints.dir: file:///flink-data/savepoints
+    state.checkpoints.dir: file:///flink-data/checkpoints
+    high-availability: org.apache.flink.kubernetes.highavailability.KubernetesHaServicesFactory
+    high-availability.storageDir: file:///flink-data/ha
+  serviceAccount: flink
+
+  podTemplate:
+    spec:
+      nodeSelector:
+        node_id: node2
+      containers:
+        # Do not change the main container name
+        - name: flink-main-container
+          volumeMounts:
+            - mountPath: /opt/flink/custom-jar
+              subPath: jar
+              name: flink-volume-streamingad
+            - mountPath: /flink-data
+              name: flink-volume-streamingad
+              subPath: data
+            - mountPath: /opt/flink/src/main/resources
+              name: flink-volume-streamingad
+              subPath: resources
+      volumes:
+        - name: flink-volume-streamingad
+          hostPath:
+            path: /mnt/flink/streamingad-flink
+            type: Directory
+  jobManager:
+    resource:
+      memory: "1024m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "1024m"
+      cpu: 1
+  job:
+    jarURI: local:///opt/flink/custom-jar/streamingad.jar
+    parallelism: 2
+    upgradeMode: last-state
+

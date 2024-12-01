@@ -30,6 +30,7 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.flink.connector.opensearch.sink.OpensearchSinkBuilder;
 import org.apache.flink.formats.json.JsonSerializationSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.http.HttpHost;
 import org.opensearch.action.index.IndexRequest;
@@ -52,16 +53,16 @@ public class StreamingADJob {
         DataStream<InputData> inputStream = streamFromKafkaSource(env);
 //        sinkToOpensearch(inputStream.map(InputData::toHashMap), commonConfigOpensearch.VALUES_INDEX_NAME);
 
-        RandomCutForestOperator<InputData, OutputData> randomCutForestOperator =
-                RandomCutForestOperator.<InputData, OutputData>builder()
+        RandomCutForestOperator<String, InputData, OutputData> randomCutForestOperator =
+                RandomCutForestOperator.<String, InputData, OutputData>builder()
                         .setDimensions(1)
                         .setShingleSize(10)
                         .setSampleSize(628)
                         .setInputDataMapper((inputData) -> new double[]{inputData.getValue()})
                         .setResultMapper(((inputData, score) -> new OutputData(inputData.getSourceID(), inputData.getTimestamp(), inputData.getValue(), score)))
                         .build();
-
-        DataStream<OutputData> outScoreStream = inputStream.process(randomCutForestOperator, TypeInformation.of(OutputData.class)).setParallelism(1);
+        KeyedStream<InputData, String> keydInputStream = inputStream.keyBy(InputData::getSourceID);
+        DataStream<OutputData> outScoreStream = keydInputStream.process(randomCutForestOperator, TypeInformation.of(OutputData.class)).setParallelism(1);
         outScoreStream.map(OutputData::toHashMap).print();
 //        sinkToOpensearch(outScoreStream.map(OutputData::toHashMap), commonConfigOpensearch.ANOMALIES_INDEX_NAME);
 
