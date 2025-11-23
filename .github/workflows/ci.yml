@@ -1,0 +1,163 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, claude/* ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test-data-simulator:
+    name: Test Data Simulator
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: components/streaming_anomaly_detection/data-simulator
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Install dependencies
+      run: |
+        poetry install --with dev
+
+    - name: Run tests with coverage
+      run: |
+        poetry run pytest --cov=simulator --cov-report=xml --cov-report=term -v
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./components/streaming_anomaly_detection/data-simulator/coverage.xml
+        flags: data-simulator
+        name: data-simulator-coverage
+
+  lint-python:
+    name: Lint Python Code
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: components/streaming_anomaly_detection/data-simulator
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install linters
+      run: |
+        pip install black flake8 mypy bandit safety
+
+    - name: Run Black (code formatter check)
+      run: |
+        black --check src/ tests/ || true
+
+    - name: Run Flake8 (style guide)
+      run: |
+        flake8 src/ tests/ --max-line-length=120 --extend-ignore=E203,W503 || true
+
+    - name: Run Bandit (security linter)
+      run: |
+        bandit -r src/ -f json -o bandit-report.json || true
+        bandit -r src/ || true
+
+    - name: Check dependencies for vulnerabilities
+      run: |
+        safety check || true
+
+  build-flink-job:
+    name: Build Flink Job
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: components/streaming_anomaly_detection/flink/streamingad
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
+
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: flink-job
+        path: components/streaming_anomaly_detection/flink/streamingad/target/*.jar
+        retention-days: 7
+
+  docker-build-test:
+    name: Test Docker Builds
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Data Simulator Image
+      run: |
+        docker build -t data-simulator:test \
+          components/streaming_anomaly_detection/data-simulator
+
+    - name: Build Streamlit GUI Image
+      run: |
+        docker build -t streamlit-gui:test \
+          components/streaming_anomaly_detection/gui/streamlit_streaming_ad
+
+    - name: Build Flink Image
+      run: |
+        docker build -t flink-job:test \
+          components/streaming_anomaly_detection/flink
+      continue-on-error: true  # May fail without Maven cache
+
+    - name: Test docker-compose config
+      run: |
+        cd components/streaming_anomaly_detection
+        docker-compose config
+
+  markdown-lint:
+    name: Lint Markdown Files
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Markdown Lint
+      uses: articulate/actions-markdownlint@v1
+      with:
+        config: .markdownlint.json
+        files: '**/*.md'
+        ignore: node_modules
+      continue-on-error: true

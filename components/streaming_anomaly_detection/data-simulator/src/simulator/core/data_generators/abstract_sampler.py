@@ -4,14 +4,15 @@ from datetime import datetime
 from functools import cached_property
 from typing import Dict
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class AbstractSamplerParams(BaseModel):
-    interval_sec: float = 0.5
+    # Security: Limit interval to prevent resource exhaustion (min 0.01s = max 100 msg/sec)
+    interval_sec: float = Field(default=0.5, ge=0.01, le=60.0, description="Interval between samples in seconds")
 
     @cached_property
     def name(self) -> str:
