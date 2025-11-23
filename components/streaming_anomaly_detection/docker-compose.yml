@@ -54,50 +54,63 @@ services:
       - ./gui/streamlit_streaming_ad/.streamlit/secrets_for_compose.toml/:/app/.streamlit/secrets.toml
     networks:
       - playgroud-network
-      #  postgres:
-      #    image: postgres:14-alpine
-      #    ports:
-      #      - 5432:5432
-      #    volumes:
-      #      - postgres-data-streaming-ad:/var/lib/postgresql/data
-      #    environment:
-      #      - POSTGRES_PASSWORD=test_password
-      #      - POSTGRES_USER=test_user
-      #      - POSTGRES_DB=test_db
 
-#  jobmanager:
-#    image: flink:1.18
-#    ports:
-#      - "8081:8081"
-#
-#    command:
-#      - flink run /opt/flink/usrlib/job.jar --job-classname org.streamingad.StreamingADJob
-#    volumes:
-#      - ./flink/streamingad/target/streamingad-0.1-SNAPSHOT.jar:/opt/flink/usrlib/job.jar
-#      - ./flink/streamingad/src/main/resources/kafka-config-for-compose.properties:/opt/flink/src/main/resources/kafka-config.properties
-#    environment:
-#      - |
-#        FLINK_PROPERTIES=
-#        jobmanager.rpc.address: jobmanager
-#        parallelism.default: 2        
-#  
-#  
-#  taskmanager:
-#    image: flink:1.18
-#    depends_on:
-#      - jobmanager
-#    command: taskmanager
-#    volumes:
-#      - ./flink/streamingad/target/streamingad-0.1-SNAPSHOT.jar:/opt/flink/usrlib/job.jar
-#      - ./flink/streamingad/src/main/resources/kafka-config-for-compose.properties:/opt/flink/src/main/resources/kafka-config.properties
-#
-#    environment:
-#      - |
-#        FLINK_PROPERTIES=
-#        jobmanager.rpc.address: jobmanager
-#        taskmanager.numberOfTaskSlots: 2
-#        parallelism.default: 2    
-#
+  jobmanager:
+    build:
+      context: ./flink
+      dockerfile: Dockerfile
+    hostname: jobmanager
+    container_name: jobmanager
+    depends_on:
+      - broker
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        parallelism.default: 2
+    networks:
+      - playgroud-network
+
+  taskmanager:
+    build:
+      context: ./flink
+      dockerfile: Dockerfile
+    hostname: taskmanager
+    container_name: taskmanager
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        parallelism.default: 2
+    networks:
+      - playgroud-network
+
+  flink-job-submitter:
+    build:
+      context: ./flink
+      dockerfile: Dockerfile
+    container_name: flink-job-submitter
+    depends_on:
+      - jobmanager
+      - taskmanager
+      - broker
+    command: >
+      bash -c "
+        echo 'Waiting for JobManager to be ready...' &&
+        sleep 10 &&
+        /opt/flink/bin/flink run -d
+        -c org.streamingad.StreamingADJob
+        /opt/flink/usrlib/job.jar
+      "
+    networks:
+      - playgroud-network
 
 volumes:
   postgres-data-streaming-ad: { }

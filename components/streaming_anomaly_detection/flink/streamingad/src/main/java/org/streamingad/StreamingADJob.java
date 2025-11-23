@@ -50,24 +50,44 @@ public class StreamingADJob {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
+        // Read input data from Kafka
         DataStream<InputData> inputStream = streamFromKafkaSource(env);
-//        sinkToOpensearch(inputStream.map(InputData::toHashMap), commonConfigOpensearch.VALUES_INDEX_NAME);
 
+        // Optional: Sink raw input data to OpenSearch for persistence and analysis
+        // Disabled by default to simplify deployment (requires OpenSearch cluster)
+        // Uncomment and configure commonConfigOpensearch to enable
+        // sinkToOpensearch(inputStream.map(InputData::toHashMap), commonConfigOpensearch.VALUES_INDEX_NAME);
+
+        // Configure Random Cut Forest anomaly detection operator
         RandomCutForestOperator<String, InputData, OutputData> randomCutForestOperator =
                 RandomCutForestOperator.<String, InputData, OutputData>builder()
-                        .setDimensions(1)
-                        .setShingleSize(10)
-                        .setSampleSize(628)
+                        .setDimensions(1)        // Univariate time series
+                        .setShingleSize(10)      // Sliding window size
+                        .setSampleSize(628)      // RCF sample size
                         .setInputDataMapper((inputData) -> new double[]{inputData.getValue()})
-                        .setResultMapper(((inputData, score) -> new OutputData(inputData.getSourceID(), inputData.getTimestamp(), inputData.getValue(), score)))
+                        .setResultMapper(((inputData, score) -> new OutputData(
+                                inputData.getSourceID(),
+                                inputData.getTimestamp(),
+                                inputData.getValue(),
+                                score)))
                         .build();
+
+        // Apply anomaly detection per source_id
         KeyedStream<InputData, String> keydInputStream = inputStream.keyBy(InputData::getSourceID);
-        DataStream<OutputData> outScoreStream = keydInputStream.process(randomCutForestOperator, TypeInformation.of(OutputData.class)).setParallelism(1);
+        DataStream<OutputData> outScoreStream = keydInputStream
+                .process(randomCutForestOperator, TypeInformation.of(OutputData.class))
+                .setParallelism(1);
+
+        // Print results to console for debugging
         outScoreStream.map(OutputData::toHashMap).print();
-//        sinkToOpensearch(outScoreStream.map(OutputData::toHashMap), commonConfigOpensearch.ANOMALIES_INDEX_NAME);
 
+        // Optional: Sink anomaly scores to OpenSearch
+        // Disabled by default to simplify deployment
+        // sinkToOpensearch(outScoreStream.map(OutputData::toHashMap), commonConfigOpensearch.ANOMALIES_INDEX_NAME);
 
+        // Sink anomaly scores back to Kafka for consumption by downstream systems
         outScoreStream.sinkTo(getKafkaSink());
+
         env.execute();
     }
 
