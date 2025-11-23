@@ -3,6 +3,8 @@ import logging
 import uvicorn
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from simulator.app.routers.gaussian_data import gaussian_router
 from simulator.app.routers.periodic_hb import periodic_hb
@@ -14,7 +16,44 @@ app = FastAPI(
     title="Data Simulator API",
     description="Streaming data simulator with anomaly injection capabilities",
     version="0.1.0",
+    # Security: Don't expose detailed error messages in production
+    debug=False,
 )
+
+# Security: Configure CORS - restrict in production
+# For demonstration purposes, allowing all origins. In production, specify exact origins.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production: ["https://yourdomain.com"]
+    allow_credentials=False,  # Set to True only if using authentication
+    allow_methods=["GET", "POST"],  # Only allow needed methods
+    allow_headers=["*"],
+    max_age=3600,  # Cache preflight requests for 1 hour
+)
+
+# Security: Add trusted host middleware
+# In production, specify exact hosts
+# app.add_middleware(
+#     TrustedHostMiddleware,
+#     allowed_hosts=["localhost", "127.0.0.1", "yourdomain.com"]
+# )
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    """Add security headers to all responses."""
+    response = await call_next(request)
+
+    # Security headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    # Don't expose server details
+    response.headers.pop("Server", None)
+
+    return response
 
 
 @app.exception_handler(RequestValidationError)
